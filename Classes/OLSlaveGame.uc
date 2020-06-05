@@ -31,64 +31,6 @@ class OLSlaveGame extends xDeathMatch;
 //#exec AUDIO IMPORT FILE="Sounds\tut_13.wav" Name="tut_13"
 //#exec AUDIO IMPORT FILE="Sounds\tut_14.wav" Name="tut_14"
 
-/*
-
-TODO:
-*Make voice sounds louder and echoeyr and lower
-*Put in a custom icon for favor
-Fix the glow color of the taggerball
-*Fix the explosion (and glow) color of the tagger ball
-Slaves can damage people by jumping on their heads.
-Insurrection and Enslaved sounds work, others don't
-*Adjust number of slaves on become-spectator.
-*What happens when a spectator who was a slave comes back in to the game?
-
-
-DONE:
-*Make the SquadAI code better(?)
-*Make the special pickup cases
-*Make slaves get a notification of pickups
-*Add a "A gift from" message to pickups
-*Add a "Currently serving" message to slaves' HUDs
-*Replicate Master health, armor, adren
-*Look in to why the master weapons are replicating so slowly
-*Add a "You have x slaves" message somewhere for slavemasters
-*Make the way Slaves come back to life better
-*Make master hear the pickup sound
-*Implement "team beacon" for slaves and masters
-*If people leave the game, SlaveInfo[] needs to be shortened!
-*Some ammo doesn't give notification
-*Implement favor
-*Change PawnOwner.PlayerReplicationInfo to PawnOwnerPRI in HUDOLSlave
-*Put in a failsafe to make sure bots never have slaves as enemies.
-*Make a special case for Insurrection
-*Implement the tagging gun
-*Let bots aquire untagged targets
-*Notification of tag. (Slave, Master, and Tagee)
-*Set up proper scoring - extra points for killing a slavemaster, insurrection, earning freedom
-*Desactivate the invisibility combo
-*Check to make sure slave's adrenaline is shut off (revert to 99)
-*Implement Scoreboard
-*Indent own name when a slave in scoreboard
-*Add hints
-*Make screenshot sequence for gametype selection screen
-*When bots leave your slavecount isn't correct
-*Slaves can be killed.  Handle this!
-*Suiciding should give credit to last person who damaged them (Need to store it in SPRI, reset it on NotifyKilled)
-*Weapon pickups while flying redeemer
-*Masters need notification when slaves free themselves
-*Check for blank names in messages (tag messages)
-*Make the slave tagger not droppable
-*Tagged details - dead bodies tagged
-*Check the time limit ending
-*Let people specify a scorelimit
-*Use own slave effect
-*Totally get rid of slaveInfo and use the slavePRI
-*Spectators count as players!!
-*When a master suicides from lava in metalurgy, slaves are not freed
-
-*/
-
 var() config int FavorTarget;
 var() config bool bRewardSystem;
 var() config bool bSlavesEthereal;
