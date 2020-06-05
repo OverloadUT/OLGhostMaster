@@ -1,7 +1,7 @@
 //-----------------------------------------------------------
 //
 //-----------------------------------------------------------
-class OLSlaveFreedomMessage extends CriticalEventPlus;
+class OLGhostFreedomMessage extends CriticalEventPlus;
 
 var localized string MaleFreedomMessage, FemaleFreedomMessage;
 

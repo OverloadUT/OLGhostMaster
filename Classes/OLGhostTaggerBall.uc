@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveTaggerBall
+    OLGhostTaggerBall
 
     Creation date: 12/04/2004 21:42
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveTaggerBall extends Projectile;
+class OLGhostTaggerBall extends Projectile;
 
 var xEmitter Trail;
 
@@ -64,13 +64,13 @@ simulated function Explode(vector HitLocation,vector HitNormal)
 
 function HitPlayer( pawn Other, vector HitLocation )
 {
-    local OLSlavePlayerReplicationInfo MySPRI;
+    local OLGhostPlayerReplicationInfo MySPRI;
 
-    MySPRI = OLSlavePlayerReplicationInfo(InstigatorController.PlayerReplicationInfo);
+    MySPRI = OLGhostPlayerReplicationInfo(InstigatorController.PlayerReplicationInfo);
 
     if ( MySPRI.bIsSlave )
-        if ( OLSlavePlayerReplicationInfo(MySPRI.Master).AddTaggedPlayer(Other, MySPRI) )
-            OLSlaveGame(Level.Game).SlaveTaggedPlayer(Other, InstigatorController);
+        if ( OLGhostPlayerReplicationInfo(MySPRI.Master).AddTaggedPlayer(Other, MySPRI) )
+            OLGhostGame(Level.Game).SlaveTaggedPlayer(Other, InstigatorController);
     Explode( HitLocation, Normal(HitLocation-Location) );
 }
 

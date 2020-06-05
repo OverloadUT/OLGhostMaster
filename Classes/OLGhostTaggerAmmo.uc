@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveTaggerAmmo
+    OLGhostTaggerAmmo
 
     Creation date: 12/04/2004 21:39
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveTaggerAmmo extends Ammunition;
+class OLGhostTaggerAmmo extends Ammunition;
 
 defaultproperties
 {

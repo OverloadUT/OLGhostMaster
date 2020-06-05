@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlavePayerReplicationInfo
+    OLGhostPayerReplicationInfo
 
     Creation date: 09/04/2004 21:54
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlavePlayerReplicationInfo extends xPlayerReplicationInfo;
+class OLGhostPlayerReplicationInfo extends xPlayerReplicationInfo;
 
 var bool bIsSlave;
 var PlayerReplicationInfo Master;
@@ -67,7 +67,7 @@ function bool AddTaggedPlayer(pawn TaggedPawn, PlayerReplicationInfo Tagger)
     if (TaggedPawn == none)
         return false;
 
-    if (OLSlavePlayerReplicationInfo(TaggedPawn.PlayerReplicationInfo).bIsSlave)
+    if (OLGhostPlayerReplicationInfo(TaggedPawn.PlayerReplicationInfo).bIsSlave)
         return false;
 
     if ( TaggedPawn.PlayerReplicationInfo == self )

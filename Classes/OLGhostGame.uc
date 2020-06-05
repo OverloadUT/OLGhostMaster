@@ -1,20 +1,20 @@
 /*******************************************************************************
-    OLSlaveGame
+    OLGhostGame
 
     Creation date: 05/04/2004 18:05
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveGame extends xDeathMatch;
+class OLGhostGame extends xDeathMatch;
 
-//#exec AUDIO IMPORT FILE="Sounds\Liberated.wav" NAME="liberated" Package=OLSlaveAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\Insurrection.wav" NAME="insurrection" Package=OLSlaveAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\Enslaved.wav" NAME="enslaved" Package=OLSlaveAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLSlaveAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLSlaveAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\Liberated.wav" NAME="liberated" Package=OLGhostAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\Insurrection.wav" NAME="insurrection" Package=OLGhostAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\Enslaved.wav" NAME="enslaved" Package=OLGhostAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLGhostAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLGhostAnnouncer
 // #exec OBJ LOAD File="..\Textures\OLGhostMasterTex.utx" Package=OLGhostMaster
-#exec OBJ LOAD File="..\Sounds\OLSlaveAnnouncer.uax"
+#exec OBJ LOAD File="..\Sounds\OLGhostAnnouncer.uax"
 
 //#exec AUDIO IMPORT FILE="Sounds\tut_01.wav" Name="tut_01"
 //#exec AUDIO IMPORT FILE="Sounds\tut_02.wav" Name="tut_02"
@@ -49,19 +49,19 @@ static function PrecacheGameAnnouncements(AnnouncerVoice V, bool bRewardSounds)
     Super.PrecacheGameAnnouncements(V,bRewardSounds);
     if ( !bRewardSounds )
     {
-        V.PrecacheFallbackPackage("OLSlaveAnnouncer",'enslaved');
-        V.PrecacheFallbackPackage("OLSlaveAnnouncer",'liberated');
-        V.PrecacheFallbackPackage("OLSlaveAnnouncer",'earnedfreedom');
-        V.PrecacheFallbackPackage("OLSlaveAnnouncer",'Enslaved');
-        V.PrecacheFallbackPackage("OLSlaveAnnouncer",'overloadjoined');
+        V.PrecacheFallbackPackage("OLGhostAnnouncer",'enslaved');
+        V.PrecacheFallbackPackage("OLGhostAnnouncer",'liberated');
+        V.PrecacheFallbackPackage("OLGhostAnnouncer",'earnedfreedom');
+        V.PrecacheFallbackPackage("OLGhostAnnouncer",'Enslaved');
+        V.PrecacheFallbackPackage("OLGhostAnnouncer",'overloadjoined');
     }
 }
 
 /*
-// Just a little hack that should make it so that OLSlave forces the OLSlaveAnnouncer package to download.
+// Just a little hack that should make it so that OLGhost forces the OLGhostAnnouncer package to download.
 function sound UnusedFunction()
 {
-    return sound'OLSlaveAnnouncer.enslaved';
+    return sound'OLGhostAnnouncer.enslaved';
 }
 */
 
@@ -72,7 +72,7 @@ event InitGame( string Options, out string Error )
     bForceRespawn = true;
 }
 
-// Change the default pawn class to OLSlavePawn on login.
+// Change the default pawn class to OLGhostPawn on login.
 event PlayerController Login( string Portal, string Options, out string Error )
 {
     local PlayerController pc;
@@ -81,7 +81,7 @@ event PlayerController Login( string Portal, string Options, out string Error )
 
     if(pc != None)
     {
-        pc.PawnClass = class'OLSlavePawn';
+        pc.PawnClass = class'OLGhostPawn';
         xPlayer(pc).ComboNameList[3] = ""; // Remove invis combo from players list.
     }
 
@@ -133,8 +133,8 @@ function string RecommendCombo(string ComboName)
 
 function Logout(Controller Exiting)
 {
-    if( OLSlavePlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master != none )
-        UpdateSlaveCount( Controller(OLSlavePlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master.Owner) );
+    if( OLGhostPlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master != none )
+        UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master.Owner) );
 
     FreeSlaves(Exiting);
     UpdateSlaveCount();
@@ -148,8 +148,8 @@ function bool BecomeSpectator(PlayerController P)
     if ( !Super.BecomeSpectator(P) )
         return false;
 
-    if( OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).Master != none )
-        UpdateSlaveCount( Controller(OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
+    if( OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master != none )
+        UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
 
     FreeSlaves(P);
     UpdateSlaveCount();
@@ -161,13 +161,13 @@ function bool AllowBecomeActivePlayer(PlayerController P)
 {
     if ( Super.AllowBecomeActivePlayer(P) )
     {
-        if ( OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).Master == none )
+        if ( OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master == none )
         {
-            OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave = false;
+            OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave = false;
             UpdateSlaveCount();
         }
         else
-            UpdateSlaveCount( Controller(OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
+            UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
         return true;
     }
     return false;
@@ -185,12 +185,12 @@ function Bot SpawnBot(optional string botName)
 
     if (Chosen.PawnClass == None)
         Chosen.Init(); //amb
-    NewBot = Spawn(class'SlaveBot');
+    NewBot = Spawn(class'GhostBot');
 
     if(NewBot != None)
     {
         InitializeBot(NewBot,BotTeam,Chosen);
-        NewBot.PawnClass = class'OLSlavePawn';
+        NewBot.PawnClass = class'OLGhostPawn';
     }
 
     UpdateSlaveCount();
@@ -205,13 +205,13 @@ function Killed( Controller Killer, Controller Killed, Pawn KilledPawn, class<Da
     if ( (Killer == none || Killer == Killed)
             && Killed != none
             && Killed.PlayerReplicationInfo != none
-            && OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo) != none
-            && OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy != none
-            && !OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo).bIsSlave
-            && !OLSlavePlayerReplicationInfo(OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.PlayerReplicationInfo).bIsSlave )
+            && OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo) != none
+            && OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy != none
+            && !OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).bIsSlave
+            && !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.PlayerReplicationInfo).bIsSlave )
     {
-        TheRealKiller = OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.Controller;
-        OLSlavePlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy = none;
+        TheRealKiller = OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.Controller;
+        OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy = none;
         // It won't compile unless I put "self." in front... WTF?
         self.Killed(TheRealKiller,Killed,KilledPawn,damageType);
         return;
@@ -223,20 +223,20 @@ function Killed( Controller Killer, Controller Killed, Pawn KilledPawn, class<Da
 function NotifyKilled(Controller Killer, Controller Other, Pawn OtherPawn)
 {
     // If a slave killed his master, it's an insurrection!
-    if (Killer != none && OLSlavePlayerReplicationInfo(Killer.PlayerReplicationInfo) != none)
+    if (Killer != none && OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo) != none)
     {
-        if(OLSlavePlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && OLSlavePlayerReplicationInfo(Killer.PlayerReplicationInfo).Master == Other.PlayerReplicationInfo )
+        if(OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).Master == Other.PlayerReplicationInfo )
         {
             ScoreEvent(Killer.PlayerReplicationInfo,2,"insurrection");
             FreeSlave(Killer, 'insurrection');
             MakeSlave(Killer, Other);
         }
-        else if (Killer != none && Killer != Other && !OLSlavePlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && !OLSlavePlayerReplicationInfo(Other.PlayerReplicationInfo).bIsSlave)
+        else if (Killer != none && Killer != Other && !OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && !OLGhostPlayerReplicationInfo(Other.PlayerReplicationInfo).bIsSlave)
         {
             MakeSlave(Killer, Other);
         }
 
-        OLSlavePlayerReplicationInfo(Other.PlayerReplicationInfo).LastDamagedBy = none;
+        OLGhostPlayerReplicationInfo(Other.PlayerReplicationInfo).LastDamagedBy = none;
     }
 
     FreeSlaves(Other);
@@ -259,7 +259,7 @@ function ScoreKill(Controller Killer, Controller Other)
     }
     else if ( killer != none && killer.PlayerReplicationInfo != None )
     {
-        bonusscore = OLSlavePlayerReplicationInfo(other.PlayerReplicationInfo).numslaves;
+        bonusscore = OLGhostPlayerReplicationInfo(other.PlayerReplicationInfo).numslaves;
         Killer.PlayerReplicationInfo.Score += 1 + bonusscore;
         Killer.PlayerReplicationInfo.NetUpdateTime = Level.TimeSeconds - 1;
         Killer.PlayerReplicationInfo.Kills++;
@@ -305,7 +305,7 @@ function bool CheckEndGame(PlayerReplicationInfo Winner, string Reason)
         for ( P=Level.ControllerList; P!=None; P=P.nextController )
             if ( P.bIsPlayer
                 && !P.PlayerReplicationInfo.bOutOfLives
-                && !OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave
+                && !OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave
                 && ((Winner == None) || (P.PlayerReplicationInfo.Score >= Winner.Score)) )
             {
                 Winner = P.PlayerReplicationInfo;
@@ -392,9 +392,9 @@ function CheckScore(PlayerReplicationInfo Scorer)
     // Check if someone owns all the slaves.
     for ( C=Level.ControllerList; C!=None; C=C.NextController )
     {
-        if ( (OLSlavePlayerReplicationInfo(C.PlayerReplicationInfo) != None)
-          && (!OLSlavePlayerReplicationInfo(C.PlayerReplicationInfo).bIsSlave)
-          && (OLSlavePlayerReplicationInfo(C.PlayerReplicationInfo).numslaves >= TargetNum ) )
+        if ( (OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo) != None)
+          && (!OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).bIsSlave)
+          && (OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).numslaves >= TargetNum ) )
         {
             EndGame(C.PlayerReplicationInfo,"LastMan");
             return;
@@ -421,9 +421,9 @@ function CheckScore(PlayerReplicationInfo Scorer)
 
 function MakeSlave(Controller Master, Controller Slave)
 {
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = true;
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = Master.PlayerReplicationInfo;
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = true;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = Master.PlayerReplicationInfo;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
     UpdateSlaveCount(Master);
 
     // Dont let Slaves use or pickup Adrenaline.
@@ -432,7 +432,7 @@ function MakeSlave(Controller Master, Controller Slave)
     Slave.Adrenaline = FMin(99, Slave.Adrenaline);
 
     if ( PlayerController(Slave) != none )
-        PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 0);
+        PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 0);
 }
 
 function FreeSlaves(Controller Master)
@@ -441,12 +441,12 @@ function FreeSlaves(Controller Master)
 
     for(i=0;i<GameReplicationInfo.PRIArray.Length;i++)
     {
-        if (OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]) == none)
+        if (OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]) == none)
             continue;
 
         if( /*!GameReplicationInfo.PRIArray[i].bOnlySpectator*/
-            OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave
-            && Controller(OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
+            OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave
+            && Controller(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
         {
             FreeSlave( Controller(GameReplicationInfo.PRIArray[i].Owner), 'masterdied' );
         }
@@ -455,17 +455,17 @@ function FreeSlaves(Controller Master)
 
 function Freeslave(Controller Slave, optional name reason)
 {
-    local OLSlavePawn SlavePawn;
+    local OLGhostPawn SlavePawn;
     local PlayerReplicationInfo oldmaster;
 
-    SlavePawn = OLSlavePawn(Slave.Pawn);
+    SlavePawn = OLGhostPawn(Slave.Pawn);
 
-    oldmaster = OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Master;
+    oldmaster = OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master;
 
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = false;
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = none;
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).FavorPending = OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor;
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = false;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = none;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).FavorPending = OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
 
     // Re-enable adrenaline
     Slave.bAdrenalineEnabled = true;
@@ -473,18 +473,18 @@ function Freeslave(Controller Slave, optional name reason)
     if ( PlayerController(Slave) != none )
     {
         if (reason == 'favor')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 2);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 2);
         else if (reason == 'masterdied')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 1);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
         else if (reason == 'insurrection')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 3);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 3);
         else
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 1);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
     }
     if (PlayerController(oldmaster.owner) != none)
     {
         if (reason == 'favor')
-            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveFreedomMessage', 0, Slave.PlayerReplicationInfo);
+            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostFreedomMessage', 0, Slave.PlayerReplicationInfo);
     }
 
     if (SlavePawn != none && Slave.bIsPlayer && !Slave.PlayerReplicationInfo.bOnlySpectator)
@@ -510,21 +510,21 @@ function UpdateSlaveCount(optional Controller Master)
 
     for(i=0;i<GameReplicationInfo.PRIArray.Length;i++)
     {
-        if(OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]) == none || OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bOnlySpectator)
+        if(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]) == none || OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bOnlySpectator)
             continue;
 
-        if(OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave)
+        if(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave)
         {
             NumTotalSlaves++;
-            if(Master != none && Controller(OLSlavePlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
+            if(Master != none && Controller(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
                 NumSlaves++;
         } else
             NumTotalMasters++;
     }
     if (Master != none)
-        OLSlavePlayerReplicationInfo(Master.PlayerReplicationInfo).NumSlaves = NumSlaves;
-    OLSlaveGameReplicationInfo(GameReplicationInfo).NumSlaves = NumTotalSlaves;
-    OLSlaveGameReplicationInfo(GameReplicationInfo).NumMasters = NumTotalMasters;
+        OLGhostPlayerReplicationInfo(Master.PlayerReplicationInfo).NumSlaves = NumSlaves;
+    OLGhostGameReplicationInfo(GameReplicationInfo).NumSlaves = NumTotalSlaves;
+    OLGhostGameReplicationInfo(GameReplicationInfo).NumMasters = NumTotalMasters;
 
     if (Master != none && Master.PlayerReplicationInfo != none)
         CheckScore(Master.PlayerReplicationInfo);
@@ -543,34 +543,34 @@ function SlaveTaggedPlayer(pawn TaggedPawn, Controller Tagger)
     for ( C=Level.ControllerList; C!=None; C=C.NextController )
     {
         if( Bot(C) != none )
-            OLSlaveSquadAI(Bot(C).Squad).CheckEnemies(Bot(C));
+            OLGhostSquadAI(Bot(C).Squad).CheckEnemies(Bot(C));
     }
 
     AddFavor(Tagger, 15);
 
     // Send message to the tagged player
     if( PlayerController(TaggedPawn.Controller) != none )
-        PlayerController(TaggedPawn.Controller).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 1);
+        PlayerController(TaggedPawn.Controller).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostTagMessage', 1);
     // Send message to the tagger
     if( PlayerController(Tagger) != none )
-        PlayerController(Tagger).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 2, TaggedPawn.PlayerReplicationInfo);
+        PlayerController(Tagger).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostTagMessage', 2, TaggedPawn.PlayerReplicationInfo);
     // Send message to the master
-    if( OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master != none
-        && PlayerController(OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner) != none )
-        PlayerController(OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 3, TaggedPawn.PlayerReplicationInfo, Tagger.PlayerReplicationInfo);
+    if( OLGhostPlayerReplicationInfo(Tagger.PlayerReplicationInfo).master != none
+        && PlayerController(OLGhostPlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner) != none )
+        PlayerController(OLGhostPlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostTagMessage', 3, TaggedPawn.PlayerReplicationInfo, Tagger.PlayerReplicationInfo);
 }
 
 // Called when a player respawns.  This is when I set up the slave stuff
 function RestartPlayer( Controller aPlayer )
 {
-    local OLSlavePawn SP;
+    local OLGhostPawn SP;
 
     Super.RestartPlayer(aPlayer);
 
-    SP = OLSlavePawn(aPlayer.Pawn);
-    SP.bIsSlave = OLSlavePlayerReplicationInfo(aPlayer.PlayerReplicationInfo).bIsSlave;
+    SP = OLGhostPawn(aPlayer.Pawn);
+    SP.bIsSlave = OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).bIsSlave;
     if (SP.bIsSlave)
-        SP.Master = Controller(OLSlavePlayerReplicationInfo(aPlayer.PlayerReplicationInfo).Master.Owner);
+        SP.Master = Controller(OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).Master.Owner);
     else
         SP.Master = none;
 
@@ -579,21 +579,21 @@ function RestartPlayer( Controller aPlayer )
         SP.MakeSlave();
     } else {
         if (bRewardSystem)
-            SP.RewardForFavor(OLSlavePlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending);
-        OLSlavePlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending = 0;
+            SP.RewardForFavor(OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending);
+        OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending = 0;
     }
     UpdateSlaveCount();
 }
 
 function AddFavor(controller Slave, int amount)
 {
-    OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor += amount;
+    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor += amount;
     CheckFavor(Slave);
 }
 
 function CheckFavor(controller Slave)
 {
-    if (OLSlavePlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor >= FavorTarget)
+    if (OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor >= FavorTarget)
     {
         ScoreEvent(Slave.PlayerReplicationInfo,3,"earned_freedom");
         FreeSlave(Slave,'favor');
@@ -606,11 +606,11 @@ function bool PickupQuery( Pawn Other, Pickup item )
     local bool bDidPickup;
     local Pawn MasterPawn;
     local inventory copy, inv;
-    local OLSlavePawn SlavePawn;
+    local OLGhostPawn SlavePawn;
     local int firemode;
     local int Favor;
 
-    SlavePawn = OLSlavePawn(Other);
+    SlavePawn = OLGhostPawn(Other);
 
     if (item == none || Other == none)
         return false;
@@ -701,7 +701,7 @@ function bool PickupQuery( Pawn Other, Pickup item )
                 MasterPawn.PlaySound( item.PickupSound,SLOT_Interact );
 
                 if (PlayerController(MasterPawn.Controller) != none)
-                    PlayerController(MasterPawn.Controller).ReceiveLocalizedMessage(class'OLSlaveGiftMessage',0,Other.Controller.PlayerReplicationInfo);
+                    PlayerController(MasterPawn.Controller).ReceiveLocalizedMessage(class'OLGhostGiftMessage',0,Other.Controller.PlayerReplicationInfo);
 
                 AddFavor(Other.Controller, favor);
 
@@ -809,7 +809,7 @@ function BlankSlaveGiftMessage(Pawn Other)
 {
     // Send a blank SlaveGiftMessage to clear any one currently there.
     if (PlayerController(Other.Controller) != none)
-        PlayerController(Other.Controller).ReceiveLocalizedMessage(class'OLSlaveGiftMessage',1);
+        PlayerController(Other.Controller).ReceiveLocalizedMessage(class'OLGhostGiftMessage',1);
 }
 
 function int ReduceDamage( int Damage, pawn injured, pawn instigatedBy, vector HitLocation, out vector Momentum, class<DamageType> DamageType )
@@ -817,20 +817,20 @@ function int ReduceDamage( int Damage, pawn injured, pawn instigatedBy, vector H
     local int EndDamage;
 
     // Slaves can't take damage
-    if( OLSlavePawn(injured).bIsSlave )
+    if( OLGhostPawn(injured).bIsSlave )
         return 0;
 
     // Slaves can only deal damage to their masters.
     // If they kill their master, it's an insurrection!
-    if ( instigatedBy != none && OLSlavePawn(instigatedBy).bIsSlave && OLSlavePlayerReplicationInfo(instigatedBy.PlayerReplicationInfo).Master != injured.PlayerReplicationInfo)
+    if ( instigatedBy != none && OLGhostPawn(instigatedBy).bIsSlave && OLGhostPlayerReplicationInfo(instigatedBy.PlayerReplicationInfo).Master != injured.PlayerReplicationInfo)
         return 0;
 
     // Regular damage evaluation
     EndDamage = Super.ReduceDamage(Damage, injured, instigatedBy, HitLocation, Momentum, DamageType);
 
-    if (EndDamage > 0 && OLSlavePlayerReplicationInfo(injured.PlayerReplicationInfo) != none && instigatedBy != none && instigatedBy != injured)
+    if (EndDamage > 0 && OLGhostPlayerReplicationInfo(injured.PlayerReplicationInfo) != none && instigatedBy != none && instigatedBy != injured)
     {
-        OLSlavePlayerReplicationInfo(injured.PlayerReplicationInfo).LastDamagedBy = instigatedBy;
+        OLGhostPlayerReplicationInfo(injured.PlayerReplicationInfo).LastDamagedBy = instigatedBy;
     }
 
     return EndDamage;
@@ -897,16 +897,16 @@ static function array<string> GetAllLoadHints(optional bool bThisClassOnly)
 
 defaultproperties
 {
-     DMSquadClass=OLGhostMaster.OLSlaveSquadAI
+     DMSquadClass=OLGhostMaster.OLGhostSquadAI
      GameName="Ghost Master"
      Acronym="GHM"
-     DecoTextName="OLGhostMaster.OLSlaveGame"
+     DecoTextName="OLGhostMaster.OLGhostGame"
      Description="When you are killed, you become a ghost bound to your killer. If your master dies, you return to your mortal body. You can also earn your body by helping your master."
-     HUDType="OLGhostMaster.HUDOLSlave"
-     MutatorClass="OLGhostMaster.OLSlaveMutator"
-     ScoreBoardType="OLGhostMaster.OLSlaveScoreBoard"
-     GameReplicationInfoClass=OLGhostMaster.OLSlaveGameReplicationInfo
-     DeathMessageClass=OLGhostMaster.OLSlaveDeathMessage
+     HUDType="OLGhostMaster.HUDOLGhost"
+     MutatorClass="OLGhostMaster.OLGhostMutator"
+     ScoreBoardType="OLGhostMaster.OLGhostScoreBoard"
+     GameReplicationInfoClass=OLGhostMaster.OLGhostGameReplicationInfo
+     DeathMessageClass=OLGhostMaster.OLGhostDeathMessage
      bRewardSystem=True
      RewardPropText="Use Reward System"
      RewardDescText="Rewards ghosts for serving their master well. When ghosts become free, they are awarded with weapons and health depending on how much favor they earned."
@@ -918,7 +918,7 @@ defaultproperties
      FavorPropText="Favor Needed"
      FavorDescText="Defines the amount of favor ghosts need to earn their mortal bodies."
      ScreenShotName="OLGhostMasterTex.slaveshots"
-     PlayerControllerClassName="OLGhostMaster.OLSlavePlayerController"
+     PlayerControllerClassName="OLGhostMaster.OLGhostPlayerController"
      GHMHints(0)="Picking up valuable items such as the Super Shield Pack or Double Damage is worth a lot of favor. Go for the good items!"
      GHMHints(1)="As a ghost, you can earn extra favor by tagging other ghostmasters so your master can see where they are."
      GHMHints(2)="The more ghosts a ghostmaster controls, the more points they are worth when killed."

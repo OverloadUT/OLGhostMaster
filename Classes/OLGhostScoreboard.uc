@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveScoreboard
+    OLGhostScoreboard
 
     Creation date: 15/04/2004 17:51
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveScoreboard extends ScoreBoardDeathMatch;
+class OLGhostScoreboard extends ScoreBoardDeathMatch;
 
 var localized string SlavesText, SlaveText;
 var plane FullOn, GrayedOut;
@@ -112,9 +112,9 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
     {
         // Only draw boxes for non-slaves - Slaves are drawn inside their master's box
-        if( !OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+        if( !OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
         {
-            numslaves = OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).numslaves;
+            numslaves = OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numslaves;
             // Make sure slaveowners at the very bottom of the don't draw a box too large
 
             numslaves = min(numslaves,playercount - i - 1 );
@@ -187,7 +187,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
             {
                 Canvas.SetPos(NameXPos + 0.02 * BoxWidth, (PlayerBoxSizeY + BoxSpaceY)*i + BoxTextOffsetY);
                 Canvas.ColorModulate = GrayedOut;
@@ -208,7 +208,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
                 Canvas.ColorModulate = GrayedOut;
             else
                 Canvas.ColorModulate = FullOn;
@@ -222,7 +222,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
             {
                 Canvas.ColorModulate = GrayedOut;
                 Canvas.StrLen(SlaveText,Xl,Yl);
@@ -233,7 +233,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
             {
                 Canvas.ColorModulate = FullOn;
                 Canvas.SetPos(DeathsXPos, (PlayerBoxSizeY + BoxSpaceY)*i + BoxTextOffsetY);
-                Canvas.DrawText( OLSlavePlayerReplicationInfo(GRI.PRIArray[i]).numslaves ,true);
+                Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numslaves ,true);
             }
         }
 
@@ -252,7 +252,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     else
         OwnerPos = (PlayerBoxSizeY + BoxSpaceY)*OwnerOffset + BoxTextOffsetY;
 
-    if ( OLSlavePlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
+    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
     {
         Canvas.SetPos(NameXPos + 0.02 * BoxWidth, OwnerPos);
         Canvas.ColorModulate = GrayedOut;
@@ -275,7 +275,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
 
 
     // Slave indicator
-    if ( OLSlavePlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
+    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
     {
         Canvas.StrLen(SlaveText,Xl,Yl);
         Canvas.SetPos(DeathsXPos-(XL/2), OwnerPos);
@@ -284,7 +284,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     else
     {
         Canvas.SetPos(DeathsXPos, OwnerPos);
-        Canvas.DrawText( OLSlavePlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).numslaves ,true);
+        Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).numslaves ,true);
     }
 
     if ( Level.NetMode == NM_Standalone )
@@ -305,11 +305,11 @@ simulated event UpdateScoreBoard(Canvas Canvas)
 // false means P2 is higher, true means P1 is higher (or a tie)
 simulated function bool InOrder( PlayerReplicationInfo P1, PlayerReplicationInfo P2 )
 {
-    local OLSlavePlayerReplicationInfo P1S, P2S;
+    local OLGhostPlayerReplicationInfo P1S, P2S;
     local int p1i, p2i, i;
 
-    P1S = OLSlavePlayerReplicationInfo(P1);
-    P2S = OLSlavePlayerReplicationInfo(P2);
+    P1S = OLGhostPlayerReplicationInfo(P1);
+    P2S = OLGhostPlayerReplicationInfo(P2);
 
     if( P1.bOnlySpectator )
     {

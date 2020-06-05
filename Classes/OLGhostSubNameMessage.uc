@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveSubNameMessage
+    OLGhostSubNameMessage
 
     Creation date: 10/04/2004 17:11
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveSubNameMessage extends LocalMessage;
+class OLGhostSubNameMessage extends LocalMessage;
 
 var()   localized String    ControllingMessage, SlavesPluralMessage, SlavesSingularMessage, ServingMessage;
 
@@ -21,7 +21,7 @@ static function string GetString(
     
     if(Switch == 0) // "Controlling X Slaves"
     {
-        NumSlaves = OLSlavePlayerReplicationInfo(RelatedPRI_1).NumSlaves;
+        NumSlaves = OLGhostPlayerReplicationInfo(RelatedPRI_1).NumSlaves;
         if (NumSlaves == 1) // Singular
             return Default.ControllingMessage@NumSlaves@Default.SlavesSingularMessage;
         else // Plural

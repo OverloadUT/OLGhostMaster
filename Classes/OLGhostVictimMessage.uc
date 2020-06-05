@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveVictimMessage
+    OLGhostVictimMessage
 
     Creation date: 18/04/2004 23:21
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveVictimMessage extends xVictimMessage;
+class OLGhostVictimMessage extends xVictimMessage;
 
 var(Message) localized string YouWereEnslavedBy, EnslavedByTrailer;
 

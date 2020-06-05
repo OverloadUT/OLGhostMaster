@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveSquadAI
+    OLGhostSquadAI
 
     Creation date: 06/04/2004 22:56
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveSquadAI extends DMSquad;
+class OLGhostSquadAI extends DMSquad;
 
 function PostBeginPlay()
 {
@@ -25,12 +25,12 @@ function Timer()
 
 function bool SetEnemy( Bot B, Pawn NewEnemy )
 {
-    local OLSlaveGame slaveGame;
-    local OLSlavePawn slavePawn, slaveEnemy;
+    local OLGhostGame slaveGame;
+    local OLGhostPawn slavePawn, slaveEnemy;
 
-    slaveGame = OLSlaveGame(Level.Game);
-    slavePawn = OLSlavePawn(B.Pawn);
-    slaveEnemy = OLSlavePawn(NewEnemy);
+    slaveGame = OLGhostGame(Level.Game);
+    slavePawn = OLGhostPawn(B.Pawn);
+    slaveEnemy = OLGhostPawn(NewEnemy);
 
     CheckEnemies(B);
 
@@ -55,15 +55,15 @@ function bool SetEnemy( Bot B, Pawn NewEnemy )
 function CheckEnemies(Bot B)
 {
     local int i;
-    local OLSlavePawn slavePawn, slaveEnemy;
+    local OLGhostPawn slavePawn, slaveEnemy;
 
-    slavePawn = OLSlavePawn(B.Pawn);
+    slavePawn = OLGhostPawn(B.Pawn);
 
     if (slavePawn != none)
     {
         for(i=0;i<8;i++)
         {
-            slaveEnemy = OLSlavePawn( Enemies[i] );
+            slaveEnemy = OLGhostPawn( Enemies[i] );
             if (slaveEnemy == none)
                 continue;
 
@@ -78,12 +78,12 @@ function CheckEnemies(Bot B)
 
 function bool IsValidEnemy(Bot B, Pawn Enemy)
 {
-    local OLSlaveGame slaveGame;
-    local OLSlavePawn slavePawn, slaveEnemy;
+    local OLGhostGame slaveGame;
+    local OLGhostPawn slavePawn, slaveEnemy;
 
-    slaveGame = OLSlaveGame(Level.Game);
-    slavePawn = OLSlavePawn(B.Pawn);
-    slaveEnemy = OLSlavePawn(Enemy);
+    slaveGame = OLGhostGame(Level.Game);
+    slavePawn = OLGhostPawn(B.Pawn);
+    slaveEnemy = OLGhostPawn(Enemy);
 
     // If this is this bot's master, then return it can't be an enemy.
     if ( slavePawn.bIsSlave && slavePawn.Master == slaveEnemy.controller )
@@ -94,7 +94,7 @@ function bool IsValidEnemy(Bot B, Pawn Enemy)
     // If this is a slave and the target is not a slave, check to see if they have been tagged.
     if( slavePawn.bIsSlave && !slaveEnemy.bIsSlave )
     {
-        if ( !OLSlavePlayerReplicationInfo(OLSlavePlayerReplicationInfo(slavePawn.PlayerReplicationInfo).Master).IsPlayerTagged(Enemy) )
+        if ( !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(slavePawn.PlayerReplicationInfo).Master).IsPlayerTagged(Enemy) )
         {
             return true;
         }
@@ -110,6 +110,6 @@ function bool IsValidEnemy(Bot B, Pawn Enemy)
         return false;
     }
 
-    log("OLSlaveSquadAI::IsValidEnemy() reached the end of the function. This is not supposed to happen!");
+    log("OLGhostSquadAI::IsValidEnemy() reached the end of the function. This is not supposed to happen!");
     return false;
 }

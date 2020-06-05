@@ -1,5 +1,5 @@
 /*******************************************************************************
-    HUDOLSlave
+    HUDOLGhost
 
     Creation date: 09/04/2004 21:32
     Copyright (c) 2004, Greg Laabs
@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-class HUDOLSlave extends HudCDeathMatch;
+class HUDOLGhost extends HudCDeathMatch;
 
 var()   Texture             SlaveBeaconMat;
 var()   Color               SlaveBeaconColor;
@@ -59,9 +59,9 @@ simulated function PostBeginPlay()
 
 simulated function bool PRIIsSlave(PlayerReplicationInfo PRI)
 {
-    local OLSlavePlayerReplicationInfo SlaveInfo;
+    local OLGhostPlayerReplicationInfo SlaveInfo;
 
-    SlaveInfo = OLSlavePlayerReplicationInfo( PRI );
+    SlaveInfo = OLGhostPlayerReplicationInfo( PRI );
     if(SlaveInfo != none && SlaveInfo.bIsSlave)
         return true;
     else
@@ -70,9 +70,9 @@ simulated function bool PRIIsSlave(PlayerReplicationInfo PRI)
 
 simulated function PlayerReplicationInfo PRIGetMaster(PlayerReplicationInfo PRI)
 {
-    local OLSlavePlayerReplicationInfo SlaveInfo;
+    local OLGhostPlayerReplicationInfo SlaveInfo;
 
-    SlaveInfo = OLSlavePlayerReplicationInfo( PRI );
+    SlaveInfo = OLGhostPlayerReplicationInfo( PRI );
 
     return SlaveInfo.Master;
 }
@@ -83,10 +83,10 @@ simulated function DrawTaggedPlayers(Canvas C)
     local vector        ScreenPos;
     local vector        CamLoc;
     local rotator       CamRot;
-    local OLSlavePlayerReplicationInfo SlavePRI;
+    local OLGhostPlayerReplicationInfo SlavePRI;
     local float     ProgressPct;
 
-    SlavePRI = OLSlavePlayerReplicationInfo(PawnOwnerPRI);
+    SlavePRI = OLGhostPlayerReplicationInfo(PawnOwnerPRI);
 
     for(i=0;i<SlavePRI.numtags;i++)
     {
@@ -264,7 +264,7 @@ simulated function CalculateHealth()
             CurVehicleHealth = 0;
         }
     } else {
-        CurHealth = OLSlavePlayerReplicationInfo(PawnOwnerPRI).MasterHealth;
+        CurHealth = OLGhostPlayerReplicationInfo(PawnOwnerPRI).MasterHealth;
     }
 }
 
@@ -284,9 +284,9 @@ simulated function UpdateRankAndSpread(Canvas C)
 
     if( !bIsSlave )
     {
-        mySlavesNum.Value = OLSlavePlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
-        mySlaveMasterNum.Value = OLSlaveGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumMasters - 1;
-        myOtherSlavesNum.Value = OLSlaveGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumSlaves - OLSlavePlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
+        mySlavesNum.Value = OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
+        mySlaveMasterNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumMasters - 1;
+        myOtherSlavesNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumSlaves - OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
 
         if( bShowPoints )
         {
@@ -300,7 +300,7 @@ simulated function UpdateRankAndSpread(Canvas C)
             DrawNumericWidget (C, mySlavesNum, DigitsBig);
         }
     } else {
-        myFavor.Value = OLSlavePlayerReplicationInfo(PawnOwnerPRI).Favor;
+        myFavor.Value = OLGhostPlayerReplicationInfo(PawnOwnerPRI).Favor;
 
         if( bShowPoints )
         {
@@ -354,8 +354,8 @@ simulated function CalculateShield()
             CurShield = 0;
         }
     } else {
-        MaxShield = OLSlavePlayerReplicationInfo(PawnOwnerPRI).MasterShieldsMax;
-        CurShield = Clamp(OLSlavePlayerReplicationInfo(PawnOwnerPRI).MasterShields, 0, MaxShield);
+        MaxShield = OLGhostPlayerReplicationInfo(PawnOwnerPRI).MasterShieldsMax;
+        CurShield = Clamp(OLGhostPlayerReplicationInfo(PawnOwnerPRI).MasterShields, 0, MaxShield);
     }
 }
 
@@ -383,8 +383,8 @@ simulated function CalculateEnergy()
             CurEnergy = Clamp (PawnOwner.Controller.Adrenaline, 0, MaxEnergy);
         }
     } else {
-        MaxEnergy = OLSlavePlayerReplicationInfo(PawnOwnerPRI).MasterAdrenMax;
-        CurEnergy = Clamp (OLSlavePlayerReplicationInfo(PawnOwnerPRI).MasterAdren, 0, MaxEnergy);
+        MaxEnergy = OLGhostPlayerReplicationInfo(PawnOwnerPRI).MasterAdrenMax;
+        CurEnergy = Clamp (OLGhostPlayerReplicationInfo(PawnOwnerPRI).MasterAdren, 0, MaxEnergy);
     }
 }
 
@@ -392,23 +392,23 @@ function DisplayEnemyName(Canvas C, PlayerReplicationInfo PRI)
 {
     if( PRIIsSlave( PRI ) )
     {
-        PlayerOwner.ReceiveLocalizedMessage(class'OLSlaveNameMessage',1,PRI); // First part of name message
+        PlayerOwner.ReceiveLocalizedMessage(class'OLGhostNameMessage',1,PRI); // First part of name message
         if ( PRIGetMaster(PRI) != none )
-            PlayerOwner.ReceiveLocalizedMessage(class'OLSlaveSubNameMessage',1,PRI,PRIGetMaster(PRI)); // "Serving X" message
+            PlayerOwner.ReceiveLocalizedMessage(class'OLGhostSubNameMessage',1,PRI,PRIGetMaster(PRI)); // "Serving X" message
     }
     else
     {
-        PlayerOwner.ReceiveLocalizedMessage(class'OLSlaveNameMessage',0,PRI); // First part of name message
-        PlayerOwner.ReceiveLocalizedMessage(class'OLSlaveSubNameMessage',0,PRI); // First part of name message
+        PlayerOwner.ReceiveLocalizedMessage(class'OLGhostNameMessage',0,PRI); // First part of name message
+        PlayerOwner.ReceiveLocalizedMessage(class'OLGhostSubNameMessage',0,PRI); // First part of name message
     }
 }
 
 simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float ScreenLocY)
 {
-    if (P.PlayerReplicationInfo == none || OLSlavePlayerReplicationInfo(P.PlayerReplicationInfo) == none)
+    if (P.PlayerReplicationInfo == none || OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo) == none)
         return;
 
-    if ( OLSlavePlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLSlavePlayerReplicationInfo(OLSlavePlayerReplicationInfo(PawnOwnerPRI).Master).IsPlayerTagged(P) )
+    if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master).IsPlayerTagged(P) )
     {
         C.DrawColor = TaggedBeaconColor;
         C.SetPos(ScreenLocX - 0.125 * SlaveBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
@@ -420,7 +420,7 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
             TaggedBeaconMat.USize,
             TaggedBeaconMat.VSize);
     }
-    else if ( !OLSlavePlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLSlavePlayerReplicationInfo(PawnOwnerPRI).IsPlayerTagged(P) )
+    else if ( !OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(PawnOwnerPRI).IsPlayerTagged(P) )
     {
         C.DrawColor = TaggedBeaconColor;
         C.SetPos(ScreenLocX - 0.125 * SlaveBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
@@ -432,7 +432,7 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
             TaggedBeaconMat.USize,
             TaggedBeaconMat.VSize);
     }
-    else if ( OLSlavePlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLSlavePlayerReplicationInfo(PawnOwnerPRI).Master == P.PlayerReplicationInfo )
+    else if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master == P.PlayerReplicationInfo )
     {
         C.DrawColor = MasterBeaconColor;
         C.SetPos(ScreenLocX - 0.125 * MasterBeaconMat.USize, ScreenLocY - 0.125 * MasterBeaconMat.VSize);
@@ -465,7 +465,7 @@ function Timer()
         return;
 
     if ( bIsSlave )
-        PlayerOwner.ReceiveLocalizedMessage( class'OLSlaveHUDMessage', 0, Master );
+        PlayerOwner.ReceiveLocalizedMessage( class'OLGhostHUDMessage', 0, Master );
 }
 
 
@@ -476,12 +476,12 @@ simulated function DrawWeaponBar( Canvas C )
     local float HudScaleOffset, HudMinScale;
 
 //    local Weapon Weapons[WEAPON_BAR_SIZE];
-    local OLSlavePlayerReplicationInfo.WeaponInfoStruct Weapons[WEAPON_BAR_SIZE];
-    local OLSlavePlayerReplicationInfo.WeaponInfoStructTwo WeaponsTwo[WEAPON_BAR_SIZE];
+    local OLGhostPlayerReplicationInfo.WeaponInfoStruct Weapons[WEAPON_BAR_SIZE];
+    local OLGhostPlayerReplicationInfo.WeaponInfoStructTwo WeaponsTwo[WEAPON_BAR_SIZE];
     local byte ExtraWeapon[WEAPON_BAR_SIZE];
     local Inventory Inv;
-    local OLSlavePlayerReplicationInfo.WeaponInfoStruct WI;
-    local OLSlavePlayerReplicationInfo.WeaponInfoStructTwo WIT;
+    local OLGhostPlayerReplicationInfo.WeaponInfoStruct WI;
+    local OLGhostPlayerReplicationInfo.WeaponInfoStructTwo WIT;
     local Weapon W, PendingWeapon;
 
     local bool bIsSlave;
@@ -544,8 +544,8 @@ simulated function DrawWeaponBar( Canvas C )
             if ( Count > 100 )
                 break;
 
-            WI = OLSlavePlayerReplicationInfo(PawnOwnerPRI).WeaponInfo[i];
-            WIT = OLSlavePlayerReplicationInfo(PawnOwnerPRI).WeaponInfoTwo[i];
+            WI = OLGhostPlayerReplicationInfo(PawnOwnerPRI).WeaponInfo[i];
+            WIT = OLGhostPlayerReplicationInfo(PawnOwnerPRI).WeaponInfoTwo[i];
 
             if(!WI.bDefined)
                 continue;

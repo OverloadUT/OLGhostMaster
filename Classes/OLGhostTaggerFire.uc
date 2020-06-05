@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveTaggerFire
+    OLGhostTaggerFire
 
     Creation date: 11/04/2004 21:58
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveTaggerFire extends ProjectileFire;
+class OLGhostTaggerFire extends ProjectileFire;
 
 function float MaxRange()
 {
@@ -23,7 +23,7 @@ defaultproperties
 //     FireSound=SoundGroup'WeaponSounds.BioRifle.BioRifleFire'
      FireForce="BioRifleFire"
      FireRate=1.000000
-     AmmoClass=OLSlaveTaggerAmmo
+     AmmoClass=OLGhostTaggerAmmo
      AmmoPerFire=0
      ShakeRotMag=(X=70.000000)
      ShakeRotRate=(X=1000.000000)
@@ -31,7 +31,7 @@ defaultproperties
      ShakeOffsetMag=(Z=-2.000000)
      ShakeOffsetRate=(Z=1000.000000)
      ShakeOffsetTime=1.800000
-     ProjectileClass=OLGhostMaster.OLSlaveTaggerBall
+     ProjectileClass=OLGhostMaster.OLGhostTaggerBall
      BotRefireRate=1.000000
 //     FlashEmitterClass=XEffects.BioMuzFlash1st
 }

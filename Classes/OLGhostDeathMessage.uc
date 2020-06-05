@@ -7,7 +7,7 @@
 //  OptionalObject is the DamageType Class.
 //
 
-class OLSlaveDeathMessage extends LocalMessage;
+class OLGhostDeathMessage extends LocalMessage;
 
 var(Message) localized string KilledString, SomeoneString;
 
@@ -62,12 +62,12 @@ static function ClientReceive(
     )
 {
     local bool bNoConsoleDeathMessages;
-    local OLSlavePlayerReplicationInfo SlavePRI_1, SlavePRI_2;
+    local OLGhostPlayerReplicationInfo SlavePRI_1, SlavePRI_2;
 
     bNoConsoleDeathMessages = class'XGame.xDeathMessage'.default.bNoConsoleDeathMessages;
 
-    SlavePRI_1 = OLSlavePlayerReplicationInfo(RelatedPRI_1);
-    SlavePRI_2 = OLSlavePlayerReplicationInfo(RelatedPRI_2);
+    SlavePRI_1 = OLGhostPlayerReplicationInfo(RelatedPRI_1);
+    SlavePRI_2 = OLGhostPlayerReplicationInfo(RelatedPRI_2);
 
     if ( Switch == 1 )
     {
@@ -112,7 +112,7 @@ static function ClientReceive(
     else if (RelatedPRI_2 == P.PlayerReplicationInfo)
     {
         if (!SlavePRI_2.bIsSlave)
-            P.ReceiveLocalizedMessage( class'OLSlaveVictimMessage', 0, RelatedPRI_1 );
+            P.ReceiveLocalizedMessage( class'OLGhostVictimMessage', 0, RelatedPRI_1 );
 
         if ( !bNoConsoleDeathMessages )
             Super.ClientReceive(P, Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject);
@@ -126,6 +126,6 @@ defaultproperties
      KilledString="was killed by"
      SomeoneString="someone"
      bIsSpecial=False
-     ChildMessage=OLSlaveKillerMessagePlus
+     ChildMessage=OLGhostKillerMessagePlus
      DrawColor=(B=0,G=0)
 }

@@ -1,16 +1,16 @@
 /*******************************************************************************
-    OLSlavePawn
+    OLGhostPawn
 
     Creation date: 05/04/2004 22:45
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlavePawn extends xPawn;
+class OLGhostPawn extends xPawn;
 
 #exec OBJ LOAD FILE=MutantSkins.utx
 
-var OLSlaveGameReplicationInfo  OLSlaveGRI;
+var OLGhostGameReplicationInfo  OLGhostGRI;
 var bool bIsSlave;
 var Controller Master;
 
@@ -27,7 +27,7 @@ var(DeRes) float  SlaveDeResLateralFriction; // sideways friction while lifting
 replication
 {
     reliable if(Role == ROLE_Authority)
-        OLSlaveGRI, bIsSlave, Master;
+        OLGhostGRI, bIsSlave, Master;
 }
 
 event PostBeginPlay()
@@ -37,7 +37,7 @@ event PostBeginPlay()
     // Send GRI to Pawn
     if(Role == ROLE_Authority && Level.Game != None)
     {
-        OLSlaveGRI = OLSlaveGameReplicationInfo(Level.Game.GameReplicationInfo);
+        OLGhostGRI = OLGhostGameReplicationInfo(Level.Game.GameReplicationInfo);
     }
 
 }
@@ -62,7 +62,7 @@ function RewardForFavor(int favor)
     Controller.AwardAdrenaline(favor/2);
 
     // If player earned his freedom, award an extra 50 adren.
-    if(favor >= OLSlaveGame(Level.Game).FavorTarget)
+    if(favor >= OLGhostGame(Level.Game).FavorTarget)
         Controller.AwardAdrenaline(50);
 }
 
@@ -126,15 +126,15 @@ function MakeSlave()
     while(Inventory != none)
         Inventory.Destroy();
 
-    CreateInventory("OLGhostMaster.OLSlaveTagger");
-    Controller.ClientSetWeapon(class'OLSlaveTagger');
+    CreateInventory("OLGhostMaster.OLGhostTagger");
+    Controller.ClientSetWeapon(class'OLGhostTagger');
 
 
     // Invisibility
     SetInvisibility(2000000.0);
 
 
-    SlaveSpeedMultiplier = OLSlaveGame(Level.Game).SlaveSpeedMultiplier;
+    SlaveSpeedMultiplier = OLGhostGame(Level.Game).SlaveSpeedMultiplier;
 
     AirControl = Default.AirControl * SlaveSpeedMultiplier;
     GroundSpeed = Default.GroundSpeed * SlaveSpeedMultiplier;
@@ -142,10 +142,10 @@ function MakeSlave()
     AirSpeed = Default.AirSpeed * SlaveSpeedMultiplier;
     JumpZ = Default.JumpZ * SlaveSpeedMultiplier;
     bCanBeDamaged = false;
-    bProjTarget = !OLSlaveGame(Level.Game).bSlavesEthereal;
-    bBlockActors = !OLSlaveGame(Level.Game).bSlavesEthereal;
-    bBlockZeroExtentTraces = OLSlaveGame(Level.Game).bSlavesEthereal;
-    bBlockNonZeroExtentTraces = OLSlaveGame(Level.Game).bSlavesEthereal;
+    bProjTarget = !OLGhostGame(Level.Game).bSlavesEthereal;
+    bBlockActors = !OLGhostGame(Level.Game).bSlavesEthereal;
+    bBlockZeroExtentTraces = OLGhostGame(Level.Game).bSlavesEthereal;
+    bBlockNonZeroExtentTraces = OLGhostGame(Level.Game).bSlavesEthereal;
 
     if ( Bot(Controller) != none )
     {
@@ -462,7 +462,7 @@ state Dying
 defaultproperties
 {
      InvisMaterial=FinalBlend'MutantSkins.Shaders.MutantGlowFinal'
-     SlaveFXClass=OLGhostMaster.OLSlaveGlow
+     SlaveFXClass=OLGhostMaster.OLGhostGlow
      SlaveDeResLiftVel=(Points=(,(InVal=2.500000,OutVal=32.000000),(InVal=100.000000,OutVal=32.000000)))
      SlaveDeResLiftSoftness=(Points=((OutVal=0.300000),(InVal=2.500000,OutVal=0.050000),(InVal=100.000000,OutVal=0.050000)))
      SlaveDeResLateralFriction=0.300000

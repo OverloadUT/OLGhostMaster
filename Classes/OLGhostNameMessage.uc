@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveNameMessage
+    OLGhostNameMessage
 
     Creation date: 09/04/2004 22:02
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveNameMessage extends LocalMessage;
+class OLGhostNameMessage extends LocalMessage;
 
 var()   localized String    SlaveMessage;
 

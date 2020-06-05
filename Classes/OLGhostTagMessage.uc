@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveTagMessage
+    OLGhostTagMessage
 
     Creation date: 15/04/2004 22:40
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveTagMessage extends LocalMessage;
+class OLGhostTagMessage extends LocalMessage;
 
 var() sound YouAreTaggedSound;
 var() localized string YouAreTaggedMessage;

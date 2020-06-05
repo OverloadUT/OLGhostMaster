@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveHUDMessage
+    OLGhostHUDMessage
 
     Creation date: 10/04/2004 20:14
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveHUDMessage extends LocalMessage;
+class OLGhostHUDMessage extends LocalMessage;
 
 var(Message) localized string YouAreServingString;
 var(Message) color RedColor;

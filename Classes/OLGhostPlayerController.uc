@@ -1,7 +1,7 @@
 //-----------------------------------------------------------
 //
 //-----------------------------------------------------------
-class OLSlavePlayerController extends xPlayer;
+class OLGhostPlayerController extends xPlayer;
 
 function AwardAdrenaline(float amount)
 {

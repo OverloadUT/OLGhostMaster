@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveGameReplicationInfo
+    OLGhostGameReplicationInfo
 
     Creation date: 05/04/2004 22:52
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveGameReplicationInfo extends GameReplicationInfo;
+class OLGhostGameReplicationInfo extends GameReplicationInfo;
 
 var int NumSlaves;
 var int NumMasters;

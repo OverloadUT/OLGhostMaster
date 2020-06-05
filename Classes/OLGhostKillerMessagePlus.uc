@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveKillerMessagePlus
+    OLGhostKillerMessagePlus
 
     Creation date: 18/04/2004 23:28
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveKillerMessagePlus extends xKillerMessagePlus;
+class OLGhostKillerMessagePlus extends xKillerMessagePlus;
 
 var(Message) localized string YouEnslaved;
 var(Message) localized string YouEnslavedTrailer;

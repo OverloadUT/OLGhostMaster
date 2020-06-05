@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveMessage
+    OLGhostMessage
 
     Creation date: 11/04/2004 20:59
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveMessage extends LocalMessage;
+class OLGhostMessage extends LocalMessage;
 
 //#exec OBJ LOAD FILE=..\Sounds\GameSounds.uax
 

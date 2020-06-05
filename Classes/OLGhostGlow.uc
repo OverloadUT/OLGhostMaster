@@ -1,7 +1,7 @@
 //-----------------------------------------------------------
 //
 //-----------------------------------------------------------
-class OLSlaveGlow extends Emitter;
+class OLGhostGlow extends Emitter;
 
 #exec OBJ LOAD FILE=EpicParticles.utx
 
@@ -28,7 +28,7 @@ defaultproperties
          SecondsBeforeInactive=0.000000
          LifetimeRange=(Min=0.250000,Max=0.500000)
      End Object
-     Emitters(0)=SpriteEmitter'OLSlaveGlow.GlowEm0'
+     Emitters(0)=SpriteEmitter'OLGhostGlow.GlowEm0'
 
      AutoDestroy=True
      bNoDelete=False

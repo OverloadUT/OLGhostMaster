@@ -1,7 +1,7 @@
 //-----------------------------------------------------------
 //
 //-----------------------------------------------------------
-class ACTION_MakeSlave extends ScriptedAction;
+class ACTION_MakeGhost extends ScriptedAction;
 
 var(Action) name MasterTag;
 var(Action) bool bMakeSlave;
@@ -10,19 +10,19 @@ function bool InitActionFor(ScriptedController C)
 {
     local Pawn a;
 
-//    log("ACTION_MakeSlave executing... MasterTag: "$MasterTag);
+//    log("ACTION_MakeGhost executing... MasterTag: "$MasterTag);
 
     if (MasterTag != 'None')
         ForEach C.AllActors(class'Pawn', a, MasterTag)
         {
 //            log("Found master: "$a);
-            OLSlavePawn(C.Pawn).Master = a.Controller;
+            OLGhostPawn(C.Pawn).Master = a.Controller;
         }
     else
-        OLSlavePawn(C.Pawn).Master = none;
+        OLGhostPawn(C.Pawn).Master = none;
 
-    OLSlavePawn(C.Pawn).bIsSlave = bMakeSlave;
-    OLSlavePawn(C.Pawn).MakeSlave();
+    OLGhostPawn(C.Pawn).bIsSlave = bMakeSlave;
+    OLGhostPawn(C.Pawn).MakeSlave();
 
     return false;
 }

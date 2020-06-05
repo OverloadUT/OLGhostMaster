@@ -1,12 +1,12 @@
 /*******************************************************************************
-    OLSlaveGiftMessage
+    OLGhostGiftMessage
 
     Creation date: 10/04/2004 19:47
     Copyright (c) 2004, Greg Laabs
     <!-- $Id$ -->
 *******************************************************************************/
 
-class OLSlaveGiftMessage extends LocalMessage;
+class OLGhostGiftMessage extends LocalMessage;
 
 var()   localized String    GiftMessage;
 
