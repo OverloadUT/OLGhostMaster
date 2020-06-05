@@ -46,9 +46,9 @@ static function color GetColor(
 defaultproperties
 {
      ControllingMessage = "Controlling"
-     SlavesPluralMessage = "slaves"
-     SlavesSingularMessage = "slave"
-     ServingMessage = "Serving"
+     SlavesPluralMessage = "ghosts"
+     SlavesSingularMessage = "ghost"
+     ServingMessage = "Bound to"
      bIsUnique=True
      bIsConsoleMessage=False
      bFadeMessage=True

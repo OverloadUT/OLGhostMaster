@@ -41,7 +41,7 @@ var localized string RewardPropText;
 var localized string RewardDescText;
 var localized string EtherealPropText;
 var localized string EtherealDescText;
-var(LoadingHints) private localized array<string> SLVHints;
+var(LoadingHints) private localized array<string> GHMHints;
 
 
 static function PrecacheGameAnnouncements(AnnouncerVoice V, bool bRewardSounds)
@@ -886,11 +886,11 @@ static function array<string> GetAllLoadHints(optional bool bThisClassOnly)
     local int i;
     local array<string> Hints;
 
-    if ( !bThisClassOnly || default.SLVHints.Length == 0 )
+    if ( !bThisClassOnly || default.GHMHints.Length == 0 )
         Hints = Super.GetAllLoadHints();
 
-    for ( i = 0; i < default.SLVHints.Length; i++ )
-        Hints[Hints.Length] = default.SLVHints[i];
+    for ( i = 0; i < default.GHMHints.Length; i++ )
+        Hints[Hints.Length] = default.GHMHints[i];
 
     return Hints;
 }
@@ -898,10 +898,10 @@ static function array<string> GetAllLoadHints(optional bool bThisClassOnly)
 defaultproperties
 {
      DMSquadClass=OLGhostMaster.OLSlaveSquadAI
-     GameName="Slave Master"
-     Acronym="SLV"
+     GameName="Ghost Master"
+     Acronym="GHM"
      DecoTextName="OLGhostMaster.OLSlaveGame"
-     Description="When you are killed, you become your killer's slave. If your master dies, you are free. You can also free yourself by helping your master."
+     Description="When you are killed, you become a ghost bound to your killer. If your master dies, you return to your mortal body. You can also earn your body by helping your master."
      HUDType="OLGhostMaster.HUDOLSlave"
      MutatorClass="OLGhostMaster.OLSlaveMutator"
      ScoreBoardType="OLGhostMaster.OLSlaveScoreBoard"
@@ -909,17 +909,17 @@ defaultproperties
      DeathMessageClass=OLGhostMaster.OLSlaveDeathMessage
      bRewardSystem=True
      RewardPropText="Use Reward System"
-     RewardDescText="Rewards slaves for serving their master well. When slaves become free, they are awarded with weapons and health depending on how much favor they earned."
+     RewardDescText="Rewards ghosts for serving their master well. When ghosts become free, they are awarded with weapons and health depending on how much favor they earned."
      bSlavesEthereal=False
-     EtherealPropText="Slaves are Ethereal"
-     EtherealDescText="Makes slaves ethereal. Projectiles and other players pass right through them."
+     EtherealPropText="Ghosts are Ethereal"
+     EtherealDescText="Makes ghosts ethereal. Projectiles and other players pass right through them."
      SlaveSpeedMultiplier=1.3
      FavorTarget=100
      FavorPropText="Favor Needed"
-     FavorDescText="Defines the amount of favor a slave needs to gain in order to be freed."
-     ScreenShotName="OLGhostMaster.slaveshots"
+     FavorDescText="Defines the amount of favor ghosts need to earn their mortal bodies."
+     ScreenShotName="OLGhostMasterTex.slaveshots"
      PlayerControllerClassName="OLGhostMaster.OLSlavePlayerController"
-     SLVHints(0)="Picking up valuable items such as the Super Shield Pack or Double Damage is worth a lot of favor. Go for the good items!"
-     SLVHints(1)="As a slave, you can earn extra favor by tagging other slavemasters so your master can see where they are."
-     SLVHints(2)="The more slaves a slavemaster controls, the more points they are worth when killed."
+     GHMHints(0)="Picking up valuable items such as the Super Shield Pack or Double Damage is worth a lot of favor. Go for the good items!"
+     GHMHints(1)="As a ghost, you can earn extra favor by tagging other ghostmasters so your master can see where they are."
+     GHMHints(2)="The more ghosts a ghostmaster controls, the more points they are worth when killed."
 }

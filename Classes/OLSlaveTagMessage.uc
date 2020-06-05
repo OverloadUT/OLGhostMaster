@@ -79,7 +79,7 @@ defaultproperties
      YouTaggedSound=Sound'GameSounds.DDAverted'
      YouTaggedMessage="You tagged"
      YourSlaveTaggedSound=Sound'GameSounds.DDAverted'
-     YourSlaveTaggedMessage="has been tagged by your slave,"
+     YourSlaveTaggedMessage="has been tagged by your ghost,"
      Exclam="!"
      bIsUnique=True
      bFadeMessage=True

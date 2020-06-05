@@ -26,6 +26,6 @@ static function string GetString(
 
 defaultproperties
 {
-     YouWereEnslavedBy="You've been enslaved by"
+     YouWereEnslavedBy="You've been bound to"
      EnslavedByTrailer="!"
 }

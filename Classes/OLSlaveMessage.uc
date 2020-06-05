@@ -57,9 +57,10 @@ static simulated function ClientReceive(
 
     switch(Switch)
     {
-        case 0:
-            P.PlayStatusAnnouncement(default.EnslavedSound,2, false);
-        break;
+        // case 0:
+        // FIXME
+        //     P.PlayStatusAnnouncement(default.EnslavedSound,2, false);
+        // break;
 
         case 1:
             P.PlayStatusAnnouncement(default.LiberatedSound,2, true);
@@ -79,19 +80,19 @@ static simulated function ClientReceive(
 
 defaultproperties
 {
-     EnslavedSound="enslaved"
-     EnslavedMessage="Enslaved!"
-     LiberatedSound="liberated"
-     LiberatedMessage="Liberated!"
-//     EarnedFreedomSound=Sound'GameSounds.UT2K3Fanfare11'
-     EarnedFreedomSound="earnedfreedom"
-     EarnedFreedomMessage="You have earned your freedom"
-     InsurrectionSound="insurrection"
-     InsurrectionMessage="INSURRECTION!"
-     bIsUnique=True
-     bFadeMessage=True
-     Lifetime=6
-     DrawColor=(B=128,G=0)
-     StackMode=SM_Down
-     PosY=0.242000
+
+    // EnslavedSound="enslaved"
+    EnslavedMessage="Ghosted!"
+    LiberatedSound="liberated"
+    LiberatedMessage="Liberated!"
+    EarnedFreedomSound="earnedfreedom"
+    EarnedFreedomMessage="You have earned your freedom"
+    InsurrectionSound="insurrection"
+    InsurrectionMessage="INSURRECTION!"
+    bIsUnique=True
+    bFadeMessage=True
+    Lifetime=6
+    DrawColor=(B=128,G=0)
+    StackMode=SM_Down
+    PosY=0.242000
 }

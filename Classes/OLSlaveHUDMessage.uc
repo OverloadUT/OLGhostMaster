@@ -34,7 +34,7 @@ static function string GetString(
 
 defaultproperties
 {
-     YouAreServingString="You are serving"
+     YouAreServingString="You are bound to"
      RedColor=(R=255,A=255)
      bIsPartiallyUnique=True
      bIsConsoleMessage=False

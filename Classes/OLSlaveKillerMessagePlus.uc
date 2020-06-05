@@ -29,5 +29,5 @@ static function string GetString(
 
 defaultproperties
 {
-     YouEnslaved="You enslaved"
+     YouEnslavedTrailer="is now bound to you"
 }

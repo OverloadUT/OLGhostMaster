@@ -29,5 +29,5 @@ function bool InitActionFor(ScriptedController C)
 
 DefaultProperties
 {
-     ActionString="Make a Slave"
+     ActionString="Make a Ghost"
 }

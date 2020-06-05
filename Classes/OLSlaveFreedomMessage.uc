@@ -25,6 +25,6 @@ static function string GetString(
 
 DefaultProperties
 {
-    MaleFreedomMessage = "earned his freedom!"
-    FemaleFreedomMessage = "earned her freedom!"
+    MaleFreedomMessage = "earned his mortal body!"
+    FemaleFreedomMessage = "earned her mortal body!"
 }

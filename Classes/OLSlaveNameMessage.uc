@@ -37,7 +37,7 @@ static function color GetColor(
 
 defaultproperties
 {
-     SlaveMessage="Slave"
+     SlaveMessage="Ghost"
      bIsUnique=True
      bIsConsoleMessage=False
      bFadeMessage=True

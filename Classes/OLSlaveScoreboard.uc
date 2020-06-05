@@ -409,8 +409,8 @@ simulated function bool InOrder( PlayerReplicationInfo P1, PlayerReplicationInfo
 
 defaultproperties
 {
-     SlavesText="SLAVES"
-     SlaveText="SLAVE"
+     SlavesText="GHOSTS"
+     SlaveText="GHOST"
      FullOn=(W=1.000000,X=1.000000,Y=1.000000,Z=1.000000)
      GrayedOut=(W=0.750000,X=0.750000,Y=0.750000,Z=0.750000)
 }
