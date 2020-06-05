@@ -68,9 +68,9 @@ function HitPlayer( pawn Other, vector HitLocation )
 
     MySPRI = OLGhostPlayerReplicationInfo(InstigatorController.PlayerReplicationInfo);
 
-    if ( MySPRI.bIsSlave )
+    if ( MySPRI.bIsGhost )
         if ( OLGhostPlayerReplicationInfo(MySPRI.Master).AddTaggedPlayer(Other, MySPRI) )
-            OLGhostGame(Level.Game).SlaveTaggedPlayer(Other, InstigatorController);
+            OLGhostGame(Level.Game).GhostTaggedPlayer(Other, InstigatorController);
     Explode( HitLocation, Normal(HitLocation-Location) );
 }
 

@@ -8,7 +8,7 @@
 
 class OLGhostNameMessage extends LocalMessage;
 
-var()   localized String    SlaveMessage;
+var()   localized String    GhostMessage;
 
 static function string GetString(
     optional int Switch,
@@ -20,7 +20,7 @@ static function string GetString(
     if(Switch == 0)
         return RelatedPRI_1.PlayerName;
     else if(Switch == 1)
-        return Default.SlaveMessage@RelatedPRI_1.PlayerName;
+        return Default.GhostMessage@RelatedPRI_1.PlayerName;
 }
 
 static function color GetColor(
@@ -37,7 +37,7 @@ static function color GetColor(
 
 defaultproperties
 {
-     SlaveMessage="Ghost"
+     GhostMessage="Ghost"
      bIsUnique=True
      bIsConsoleMessage=False
      bFadeMessage=True

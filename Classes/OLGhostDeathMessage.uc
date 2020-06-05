@@ -1,5 +1,5 @@
 //
-// A SlaveMaster Death Message.
+// A GhostMaster Death Message.
 //
 // Switch 0: Kill
 //  RelatedPRI_1 is the Killer.
@@ -62,12 +62,12 @@ static function ClientReceive(
     )
 {
     local bool bNoConsoleDeathMessages;
-    local OLGhostPlayerReplicationInfo SlavePRI_1, SlavePRI_2;
+    local OLGhostPlayerReplicationInfo GhostPRI_1, GhostPRI_2;
 
     bNoConsoleDeathMessages = class'XGame.xDeathMessage'.default.bNoConsoleDeathMessages;
 
-    SlavePRI_1 = OLGhostPlayerReplicationInfo(RelatedPRI_1);
-    SlavePRI_2 = OLGhostPlayerReplicationInfo(RelatedPRI_2);
+    GhostPRI_1 = OLGhostPlayerReplicationInfo(RelatedPRI_1);
+    GhostPRI_2 = OLGhostPlayerReplicationInfo(RelatedPRI_2);
 
     if ( Switch == 1 )
     {
@@ -79,7 +79,7 @@ static function ClientReceive(
         || (P.PlayerReplicationInfo.bOnlySpectator && (Pawn(P.ViewTarget) != None) && (Pawn(P.ViewTarget).PlayerReplicationInfo == RelatedPRI_1)) )
     {
         // Interdict and send the child message instead.
-        if (!SlavePRI_2.bIsSlave)
+        if (!GhostPRI_2.bIsGhost)
             P.myHUD.LocalizedMessage( Default.ChildMessage, Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject );
         if ( !bNoConsoleDeathMessages )
             P.myHUD.LocalizedMessage( Default.Class, Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject );
@@ -111,7 +111,7 @@ static function ClientReceive(
     }
     else if (RelatedPRI_2 == P.PlayerReplicationInfo)
     {
-        if (!SlavePRI_2.bIsSlave)
+        if (!GhostPRI_2.bIsGhost)
             P.ReceiveLocalizedMessage( class'OLGhostVictimMessage', 0, RelatedPRI_1 );
 
         if ( !bNoConsoleDeathMessages )

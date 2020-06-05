@@ -8,7 +8,7 @@
 
 class OLGhostSubNameMessage extends LocalMessage;
 
-var()   localized String    ControllingMessage, SlavesPluralMessage, SlavesSingularMessage, ServingMessage;
+var()   localized String    ControllingMessage, GhostsPluralMessage, GhostsSingularMessage, ServingMessage;
 
 static function string GetString(
     optional int Switch,
@@ -17,15 +17,15 @@ static function string GetString(
     optional Object OptionalObject
     )
 {
-    local int NumSlaves;
+    local int NumGhosts;
     
-    if(Switch == 0) // "Controlling X Slaves"
+    if(Switch == 0) // "Controlling X Ghosts"
     {
-        NumSlaves = OLGhostPlayerReplicationInfo(RelatedPRI_1).NumSlaves;
-        if (NumSlaves == 1) // Singular
-            return Default.ControllingMessage@NumSlaves@Default.SlavesSingularMessage;
+        NumGhosts = OLGhostPlayerReplicationInfo(RelatedPRI_1).NumGhosts;
+        if (NumGhosts == 1) // Singular
+            return Default.ControllingMessage@NumGhosts@Default.GhostsSingularMessage;
         else // Plural
-            return Default.ControllingMessage@NumSlaves@Default.SlavesPluralMessage;
+            return Default.ControllingMessage@NumGhosts@Default.GhostsPluralMessage;
     }
     else if(Switch == 1)
         return Default.ServingMessage@RelatedPRI_2.PlayerName; // "Serving X"
@@ -46,8 +46,8 @@ static function color GetColor(
 defaultproperties
 {
      ControllingMessage = "Controlling"
-     SlavesPluralMessage = "ghosts"
-     SlavesSingularMessage = "ghost"
+     GhostsPluralMessage = "ghosts"
+     GhostsSingularMessage = "ghost"
      ServingMessage = "Bound to"
      bIsUnique=True
      bIsConsoleMessage=False

@@ -8,10 +8,8 @@
 
 class OLGhostMessage extends LocalMessage;
 
-//#exec OBJ LOAD FILE=..\Sounds\GameSounds.uax
-
-var() name EnslavedSound;
-var() localized string EnslavedMessage;
+// var() name GhostedSound;
+var() localized string GhostedMessage;
 var() name LiberatedSound;
 var() localized string LiberatedMessage;
 var() name EarnedFreedomSound;
@@ -29,7 +27,7 @@ static function string GetString(
     switch(switch)
     {
         case 0:
-            return default.EnslavedMessage;
+            return default.GhostedMessage;
         case 1:
             return default.LiberatedMessage;
         case 2:
@@ -58,8 +56,7 @@ static simulated function ClientReceive(
     switch(Switch)
     {
         // case 0:
-        // FIXME
-        //     P.PlayStatusAnnouncement(default.EnslavedSound,2, false);
+        //     P.PlayStatusAnnouncement(default.GhostedSound,2, false);
         // break;
 
         case 1:
@@ -81,8 +78,8 @@ static simulated function ClientReceive(
 defaultproperties
 {
 
-    // EnslavedSound="enslaved"
-    EnslavedMessage="Ghosted!"
+    // GhostedSound="ghosted" (doesn't exist)
+    GhostedMessage="Ghosted!"
     LiberatedSound="liberated"
     LiberatedMessage="Liberated!"
     EarnedFreedomSound="earnedfreedom"

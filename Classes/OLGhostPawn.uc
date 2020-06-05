@@ -11,23 +11,23 @@ class OLGhostPawn extends xPawn;
 #exec OBJ LOAD FILE=MutantSkins.utx
 
 var OLGhostGameReplicationInfo  OLGhostGRI;
-var bool bIsSlave;
+var bool bIsGhost;
 var Controller Master;
 
-var bool            bSlaveEffect;
-var bool            bOldSlaveEffect;
-var Emitter         SlaveFX;
-var Class<Emitter>  SlaveFXClass;
+var bool            bGhostEffect;
+var bool            bOldGhostEffect;
+var Emitter         GhostFX;
+var Class<Emitter>  GhostFXClass;
 
-var(DeRes) InterpCurve SlaveDeResLiftVel; // speed (over time) at which body rises
-var(DeRes) InterpCurve SlaveDeResLiftSoftness; // vertical 'sprinyness' (over time) of bone lifters
-var(DeRes) float  SlaveDeResGravScale; // reduce gravity on corpse during de-res
-var(DeRes) float  SlaveDeResLateralFriction; // sideways friction while lifting
+var(DeRes) InterpCurve GhostDeResLiftVel; // speed (over time) at which body rises
+var(DeRes) InterpCurve GhostDeResLiftSoftness; // vertical 'sprinyness' (over time) of bone lifters
+var(DeRes) float  GhostDeResGravScale; // reduce gravity on corpse during de-res
+var(DeRes) float  GhostDeResLateralFriction; // sideways friction while lifting
 
 replication
 {
     reliable if(Role == ROLE_Authority)
-        OLGhostGRI, bIsSlave, Master;
+        OLGhostGRI, bIsGhost, Master;
 }
 
 event PostBeginPlay()
@@ -110,7 +110,7 @@ function GiveRandomWeapon()
     item.GiveTo(self);
 }
 
-function FreeSlave()
+function FreeGhost()
 {
 //    PlayDyingAnimation(class'DamageType', vect(0,0,0));
 //    Health = 0;
@@ -118,9 +118,9 @@ function FreeSlave()
     Destroy();
 }
 
-function MakeSlave()
+function MakeGhost()
 {
-    local float SlaveSpeedMultiplier;
+    local float GhostSpeedMultiplier;
 
     // Remove all of the player's inventory
     while(Inventory != none)
@@ -134,18 +134,18 @@ function MakeSlave()
     SetInvisibility(2000000.0);
 
 
-    SlaveSpeedMultiplier = OLGhostGame(Level.Game).SlaveSpeedMultiplier;
+    GhostSpeedMultiplier = OLGhostGame(Level.Game).GhostSpeedMultiplier;
 
-    AirControl = Default.AirControl * SlaveSpeedMultiplier;
-    GroundSpeed = Default.GroundSpeed * SlaveSpeedMultiplier;
-    WaterSpeed = Default.WaterSpeed * SlaveSpeedMultiplier;
-    AirSpeed = Default.AirSpeed * SlaveSpeedMultiplier;
-    JumpZ = Default.JumpZ * SlaveSpeedMultiplier;
+    AirControl = Default.AirControl * GhostSpeedMultiplier;
+    GroundSpeed = Default.GroundSpeed * GhostSpeedMultiplier;
+    WaterSpeed = Default.WaterSpeed * GhostSpeedMultiplier;
+    AirSpeed = Default.AirSpeed * GhostSpeedMultiplier;
+    JumpZ = Default.JumpZ * GhostSpeedMultiplier;
     bCanBeDamaged = false;
-    bProjTarget = !OLGhostGame(Level.Game).bSlavesEthereal;
-    bBlockActors = !OLGhostGame(Level.Game).bSlavesEthereal;
-    bBlockZeroExtentTraces = OLGhostGame(Level.Game).bSlavesEthereal;
-    bBlockNonZeroExtentTraces = OLGhostGame(Level.Game).bSlavesEthereal;
+    bProjTarget = !OLGhostGame(Level.Game).bGhostsEthereal;
+    bBlockActors = !OLGhostGame(Level.Game).bGhostsEthereal;
+    bBlockZeroExtentTraces = OLGhostGame(Level.Game).bGhostsEthereal;
+    bBlockNonZeroExtentTraces = OLGhostGame(Level.Game).bGhostsEthereal;
 
     if ( Bot(Controller) != none )
     {
@@ -158,47 +158,47 @@ simulated function TickFX(float DeltaTime)
 {
     Super.TickFX(DeltaTime);
 
-    // See if this is a slave
-    if( bIsSlave )
-        bSlaveEffect = true;
+    // See if this is a ghost
+    if( bIsGhost )
+        bGhostEffect = true;
     else
-        bSlaveEffect = false;
+        bGhostEffect = false;
 
-    if(bSlaveEffect && !bOldSlaveEffect)
+    if(bGhostEffect && !bOldGhostEffect)
     {
         // Spawn funky glowy effect
-        SlaveFX = Spawn(SlaveFXClass, self, , Location);
-        if ( SlaveFX != None )
+        GhostFX = Spawn(GhostFXClass, self, , Location);
+        if ( GhostFX != None )
         {
-            SlaveFX.Emitters[0].SkeletalMeshActor = self;
-            SlaveFX.SetLocation(Location - vect(0, 0, 49));
-            SlaveFX.SetRotation(Rotation + rot(0, -16384, 0));
-            SlaveFX.SetBase(self);
+            GhostFX.Emitters[0].SkeletalMeshActor = self;
+            GhostFX.SetLocation(Location - vect(0, 0, 49));
+            GhostFX.SetRotation(Rotation + rot(0, -16384, 0));
+            GhostFX.SetBase(self);
         }
     }
-    else if(!bSlaveEffect && bOldSlaveEffect)
+    else if(!bGhostEffect && bOldGhostEffect)
     {
         // Remove funky glowy effect
-        if( SlaveFX != None )
+        if( GhostFX != None )
         {
-            SlaveFX.Emitters[0].SkeletalMeshActor = None;
-            SlaveFX.Kill();
-            SlaveFX = None;
+            GhostFX.Emitters[0].SkeletalMeshActor = None;
+            GhostFX.Kill();
+            GhostFX = None;
         }
     }
 
-    bOldSlaveEffect = bSlaveEffect;
+    bOldGhostEffect = bGhostEffect;
 }
 
 simulated function Destroyed()
 {
     Super.Destroyed();
 
-    if( SlaveFX != None )
+    if( GhostFX != None )
     {
-        SlaveFX.Emitters[0].SkeletalMeshActor = None;
-        SlaveFX.Kill();
-        SlaveFX = None;
+        GhostFX.Emitters[0].SkeletalMeshActor = None;
+        GhostFX.Kill();
+        GhostFX = None;
     }
 }
 
@@ -222,7 +222,7 @@ simulated function StartDeRes()
         DeResFX.SetBase(self);
     }
 
-    if (!bIsSlave)
+    if (!bIsGhost)
     {
         Skins[0] = DeResMat0;
         Skins[1] = DeResMat1;
@@ -235,7 +235,7 @@ simulated function StartDeRes()
 
     if( Physics == PHYS_KarmaRagdoll )
     {
-        if (!bIsSlave)
+        if (!bIsGhost)
         {
             // Attach bone lifter to raise body
             KAddBoneLifter('bip01 Spine', DeResLiftVel, DeResLateralFriction, DeResLiftSoftness);
@@ -252,8 +252,8 @@ simulated function StartDeRes()
             skelParams.bKDoConvulsions = false;
         } else {
             // Attach bone lifter to raise body
-            KAddBoneLifter('bip01 Spine', SlaveDeResLiftVel, SlaveDeResLateralFriction, SlaveDeResLiftSoftness);
-            KAddBoneLifter('bip01 Spine2', SlaveDeResLiftVel, SlaveDeResLateralFriction, SlaveDeResLiftSoftness);
+            KAddBoneLifter('bip01 Spine', GhostDeResLiftVel, GhostDeResLateralFriction, GhostDeResLiftSoftness);
+            KAddBoneLifter('bip01 Spine2', GhostDeResLiftVel, GhostDeResLateralFriction, GhostDeResLiftSoftness);
 
             // Turn off gravity while de-res-ing
             KSetActorGravScale(DeResGravScale);
@@ -429,7 +429,7 @@ function PlayDyingAnimation(class<DamageType> DamageType, vector HitLoc)
 
             skelParams.KActorGravScale = RagGravScale;
 
-            if (bIsSlave)
+            if (bIsGhost)
                 StartDeres();
 
             return;
@@ -452,7 +452,7 @@ state Dying
 {
     simulated function BeginState()
     {
-//        if (!bIsSlave)
+//        if (!bIsGhost)
             Super.BeginState();
 //        else
             AmbientSound = None;
@@ -462,9 +462,9 @@ state Dying
 defaultproperties
 {
      InvisMaterial=FinalBlend'MutantSkins.Shaders.MutantGlowFinal'
-     SlaveFXClass=OLGhostMaster.OLGhostGlow
-     SlaveDeResLiftVel=(Points=(,(InVal=2.500000,OutVal=32.000000),(InVal=100.000000,OutVal=32.000000)))
-     SlaveDeResLiftSoftness=(Points=((OutVal=0.300000),(InVal=2.500000,OutVal=0.050000),(InVal=100.000000,OutVal=0.050000)))
-     SlaveDeResLateralFriction=0.300000
+     GhostFXClass=OLGhostMaster.OLGhostGlow
+     GhostDeResLiftVel=(Points=(,(InVal=2.500000,OutVal=32.000000),(InVal=100.000000,OutVal=32.000000)))
+     GhostDeResLiftSoftness=(Points=((OutVal=0.300000),(InVal=2.500000,OutVal=0.050000),(InVal=100.000000,OutVal=0.050000)))
+     GhostDeResLateralFriction=0.300000
      bScriptPostRender = true;
 }

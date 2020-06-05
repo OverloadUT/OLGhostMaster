@@ -8,7 +8,7 @@
 
 class OLGhostVictimMessage extends xVictimMessage;
 
-var(Message) localized string YouWereEnslavedBy, EnslavedByTrailer;
+var(Message) localized string YouWereGhostedBy, GhostedByTrailer;
 
 static function string GetString(
     optional int Switch,
@@ -21,11 +21,11 @@ static function string GetString(
         return "";
 
     if (RelatedPRI_1.PlayerName != "")
-        return Default.YouWereEnslavedBy@RelatedPRI_1.PlayerName$Default.EnslavedByTrailer;
+        return Default.YouWereGhostedBy@RelatedPRI_1.PlayerName$Default.GhostedByTrailer;
 }
 
 defaultproperties
 {
-     YouWereEnslavedBy="You've been bound to"
-     EnslavedByTrailer="!"
+     YouWereGhostedBy="You've been bound to"
+     GhostedByTrailer="!"
 }

@@ -8,8 +8,8 @@
 
 class OLGhostKillerMessagePlus extends xKillerMessagePlus;
 
-var(Message) localized string YouEnslaved;
-var(Message) localized string YouEnslavedTrailer;
+var(Message) localized string YouGhosted;
+var(Message) localized string YouGhostedTrailer;
 
 static function string GetString(
     optional int Switch,
@@ -24,10 +24,10 @@ static function string GetString(
         return "";
 
     if (RelatedPRI_2.PlayerName != "")
-        return Default.YouEnslaved@RelatedPRI_2.PlayerName@Default.YouEnslavedTrailer;
+        return Default.YouGhosted@RelatedPRI_2.PlayerName@Default.YouGhostedTrailer;
 }
 
 defaultproperties
 {
-     YouEnslavedTrailer="is now bound to you"
+     YouGhostedTrailer="is now bound to you"
 }

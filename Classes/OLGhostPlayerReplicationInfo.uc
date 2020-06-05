@@ -8,9 +8,9 @@
 
 class OLGhostPlayerReplicationInfo extends xPlayerReplicationInfo;
 
-var bool bIsSlave;
+var bool bIsGhost;
 var PlayerReplicationInfo Master;
-var int NumSlaves;
+var int NumGhosts;
 var int Favor;
 var int FavorPending;
 var int MasterHealth;
@@ -51,7 +51,7 @@ replication
 {
     // Things the server should send to the client.
     reliable if ( bNetDirty && (Role == Role_Authority) )
-        bIsSlave, Master, NumSlaves, MasterShields, MasterShieldsMax, MasterHealth,
+        bIsGhost, Master, NumGhosts, MasterShields, MasterShieldsMax, MasterHealth,
         MasterAdren, MasterAdrenMax, WeaponInfo, WeaponInfoTwo, numtags, Favor,
         TaggedPRI;
 
@@ -67,7 +67,7 @@ function bool AddTaggedPlayer(pawn TaggedPawn, PlayerReplicationInfo Tagger)
     if (TaggedPawn == none)
         return false;
 
-    if (OLGhostPlayerReplicationInfo(TaggedPawn.PlayerReplicationInfo).bIsSlave)
+    if (OLGhostPlayerReplicationInfo(TaggedPawn.PlayerReplicationInfo).bIsGhost)
         return false;
 
     if ( TaggedPawn.PlayerReplicationInfo == self )
@@ -110,7 +110,7 @@ function Tick(float Delta)
     // Tagged Player Replication
     for (i=0;i<TaggedPlayers.Length;i++)
     {
-        if( TaggedPlayers[i].Pawn == none || bIsSlave || TaggedPlayers[i].Pawn.Health <= 0)
+        if( TaggedPlayers[i].Pawn == none || bIsGhost || TaggedPlayers[i].Pawn.Health <= 0)
         {
             TaggedPlayers.Remove(i--,1);
             continue;
@@ -124,7 +124,7 @@ function Tick(float Delta)
     numtags = i;
 
     // Master weapon replication
-    if (bIsslave && Master != none
+    if (bIsGhost && Master != none
         && Controller(Master.Owner) != none
         && Controller(Master.Owner).Pawn != none)
     {
@@ -156,7 +156,7 @@ function Tick(float Delta)
             WeaponInfoTwo[slot].IconCoords = W.IconCoords;
         }
 
-        // Other Master stuff for the Slave HUD
+        // Other Master stuff for the Ghost HUD
         MasterHealth = Controller(Master.Owner).Pawn.Health;
         MasterShields = xPawn(Controller(Master.Owner).Pawn).ShieldStrength;
         MasterShieldsMax = xPawn(Controller(Master.Owner).Pawn).ShieldStrengthMax;

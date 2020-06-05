@@ -8,7 +8,7 @@
 
 class OLGhostScoreboard extends ScoreBoardDeathMatch;
 
-var localized string SlavesText, SlaveText;
+var localized string GhostsText, GhostText;
 var plane FullOn, GrayedOut;
 
 
@@ -21,7 +21,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     local string playername[MAXPLAYERS];
     local bool bNameFontReduction;
     local plane OldColorModulate;
-    local int numslaves;
+    local int numghosts;
 
 
     OldColorModulate = Canvas.ColorModulate;
@@ -111,15 +111,15 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     Canvas.DrawColor = HUDClass.default.WhiteColor * 0.5;
     for ( i=0; i<PlayerCount; i++ )
     {
-        // Only draw boxes for non-slaves - Slaves are drawn inside their master's box
-        if( !OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+        // Only draw boxes for non-ghosts - Ghosts are drawn inside their master's box
+        if( !OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsGhost )
         {
-            numslaves = OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numslaves;
-            // Make sure slaveowners at the very bottom of the don't draw a box too large
+            numghosts = OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numghosts;
+            // Make sure ghostmasters at the very bottom of the don't draw a box too large
 
-            numslaves = min(numslaves,playercount - i - 1 );
+            numghosts = min(numghosts,playercount - i - 1 );
             Canvas.SetPos(BoxXPos, HeaderOffsetY + (PlayerBoxSizeY + BoxSpaceY)*i);
-            Canvas.DrawTileStretched( BoxMaterial, BoxWidth, (PlayerBoxSizeY * (numslaves + 1) ) + (BoxSpaceY * numslaves ) );
+            Canvas.DrawTileStretched( BoxMaterial, BoxWidth, (PlayerBoxSizeY * (numghosts + 1) ) + (BoxSpaceY * numghosts ) );
         }
     }
     Canvas.Style = ERenderStyle.STY_Translucent;
@@ -131,7 +131,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     // Draw headers
     TitleYPos = HeaderOffsetY - 1.25*YL;
     Canvas.StrLen(PointsText, ScoreXL, YL);
-    Canvas.StrLen(SlavesText, DeathsXL, YL);
+    Canvas.StrLen(GhostsText, DeathsXL, YL);
 
     Canvas.DrawColor = HUDClass.default.WhiteColor;
     Canvas.SetPos(NameXPos, TitleYPos);
@@ -139,7 +139,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     Canvas.SetPos(ScoreXPos - 0.5*ScoreXL, TitleYPos);
     Canvas.DrawText(PointsText,true);
     Canvas.SetPos(DeathsXPos - 0.5*DeathsXL, TitleYPos);
-    Canvas.DrawText(SlavesText,true);
+    Canvas.DrawText(GhostsText,true);
 
     // draw player names
     MaxNamePos = 0.9 * (ScoreXPos - NameXPos);
@@ -187,7 +187,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsGhost )
             {
                 Canvas.SetPos(NameXPos + 0.02 * BoxWidth, (PlayerBoxSizeY + BoxSpaceY)*i + BoxTextOffsetY);
                 Canvas.ColorModulate = GrayedOut;
@@ -208,7 +208,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsGhost )
                 Canvas.ColorModulate = GrayedOut;
             else
                 Canvas.ColorModulate = FullOn;
@@ -217,23 +217,23 @@ simulated event UpdateScoreBoard(Canvas Canvas)
             Canvas.DrawText(int(GRI.PRIArray[i].Score),true);
         }
 
-    // draw number of slaves
+    // draw number of ghosts
     Canvas.DrawColor = HUDClass.default.WhiteColor;
     for ( i=0; i<PlayerCount; i++ )
         if ( i != OwnerOffset )
         {
-            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsSlave )
+            if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).bIsGhost )
             {
                 Canvas.ColorModulate = GrayedOut;
-                Canvas.StrLen(SlaveText,Xl,Yl);
+                Canvas.StrLen(GhostText,Xl,Yl);
                 Canvas.SetPos(DeathsXPos - (XL/2), (PlayerBoxSizeY + BoxSpaceY)*i + BoxTextOffsetY);
-                Canvas.DrawText(SlaveText,true);
+                Canvas.DrawText(GhostText,true);
             }
             else
             {
                 Canvas.ColorModulate = FullOn;
                 Canvas.SetPos(DeathsXPos, (PlayerBoxSizeY + BoxSpaceY)*i + BoxTextOffsetY);
-                Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numslaves ,true);
+                Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[i]).numghosts ,true);
             }
         }
 
@@ -252,7 +252,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     else
         OwnerPos = (PlayerBoxSizeY + BoxSpaceY)*OwnerOffset + BoxTextOffsetY;
 
-    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
+    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsGhost )
     {
         Canvas.SetPos(NameXPos + 0.02 * BoxWidth, OwnerPos);
         Canvas.ColorModulate = GrayedOut;
@@ -274,17 +274,17 @@ simulated event UpdateScoreBoard(Canvas Canvas)
     Canvas.DrawText(int(GRI.PRIArray[OwnerOffset].Score),true);
 
 
-    // Slave indicator
-    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsSlave )
+    // Ghost indicator
+    if ( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).bIsGhost )
     {
-        Canvas.StrLen(SlaveText,Xl,Yl);
+        Canvas.StrLen(GhostText,Xl,Yl);
         Canvas.SetPos(DeathsXPos-(XL/2), OwnerPos);
-        Canvas.DrawText(SlaveText,true);
+        Canvas.DrawText(GhostText,true);
     }
     else
     {
         Canvas.SetPos(DeathsXPos, OwnerPos);
-        Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).numslaves ,true);
+        Canvas.DrawText( OLGhostPlayerReplicationInfo(GRI.PRIArray[OwnerOffset]).numghosts ,true);
     }
 
     if ( Level.NetMode == NM_Standalone )
@@ -322,36 +322,36 @@ simulated function bool InOrder( PlayerReplicationInfo P1, PlayerReplicationInfo
         return true;
 
     // If P2 is P1's master, then P1 goes below P2.
-    if (P1S.bIsSlave && !P2S.bIsSlave && P1S.Master != none && P1S.Master == P2S)
+    if (P1S.bIsGhost && !P2S.bIsGhost && P1S.Master != none && P1S.Master == P2S)
     {
         return false;
     }
     // Also, if P1 is P2's master, then P2 goes below P1.
-    if (P2S.bIsSlave && !P1S.bIsSlave && P2S.Master != none && P2S.Master == P1S)
+    if (P2S.bIsGhost && !P1S.bIsGhost && P2S.Master != none && P2S.Master == P1S)
     {
         return true;
     }
 
-    // If P1 is a slave and P2 is not, check to see if P1's master is better than P2.
-    if (P1S.bIsSlave && !P2S.bIsSlave && P1S.Master != none && !InOrder(P1S.Master, P2) )
+    // If P1 is a ghost and P2 is not, check to see if P1's master is better than P2.
+    if (P1S.bIsGhost && !P2S.bIsGhost && P1S.Master != none && !InOrder(P1S.Master, P2) )
     {
         return false;
     }
 
-    // If P2 is a slave and P1 is not, check to see if P2's master is better than P1
-    if (P2S.bIsSlave && !P1S.bIsSlave && P2S.Master != none && !InOrder(P1, P2S.Master) )
+    // If P2 is a ghost and P1 is not, check to see if P2's master is better than P1
+    if (P2S.bIsGhost && !P1S.bIsGhost && P2S.Master != none && !InOrder(P1, P2S.Master) )
     {
         return false;
     }
 
-    // If they're both slaves, check their masters.
-    if (P1S.bIsSlave && P2S.bIsSlave && P1S.Master != none && P2S.Master != none && P1S.Master != P2S.Master && !InOrder(P1S.Master, P2S.Master) )
+    // If they're both ghosts, check their masters.
+    if (P1S.bIsGhost && P2S.bIsGhost && P1S.Master != none && P2S.Master != none && P1S.Master != P2S.Master && !InOrder(P1S.Master, P2S.Master) )
     {
         return false;
     }
 
-    // If they're both slaves and have the same master, check scores.
-    if (P1S.bIsSlave && P2S.bIsSlave && P1S.Master != none && P2S.Master != none && P1S.Master == P2S.Master )
+    // If they're both ghosts and have the same master, check scores.
+    if (P1S.bIsGhost && P2S.bIsGhost && P1S.Master != none && P2S.Master != none && P1S.Master == P2S.Master )
     {
         if (P2.Score > P1.Score)
         {
@@ -370,17 +370,12 @@ simulated function bool InOrder( PlayerReplicationInfo P1, PlayerReplicationInfo
         }
     }
 
-    // If they're both not slaves, compare number of slaves, then score, then deaths
-    if (!P1S.bIsSlave && !P2S.bIsSlave)
+    // If they're both not ghosts, compare number of ghosts, then score, then deaths
+    if (!P1S.bIsGhost && !P2S.bIsGhost)
     {
-        // No longer sorting by number of slaves - if a player wins by enslaving
-        // everyone, he'll be on top anyway because slaves go below a their
+        // No longer sorting by number of ghosts - if a player wins by capturing
+        // everyone, he'll be on top anyway because ghosts go below a their
         // master.
-
-//        if (P2S.numslaves > P1S.numslaves)
-//            return false;
-//        else if (P2S.numslaves == P1S.numslaves)
-//        {
 
         if (P2.Score > P1.Score)
             return false;
@@ -409,8 +404,8 @@ simulated function bool InOrder( PlayerReplicationInfo P1, PlayerReplicationInfo
 
 defaultproperties
 {
-     SlavesText="GHOSTS"
-     SlaveText="GHOST"
+     GhostsText="GHOSTS"
+     GhostText="GHOST"
      FullOn=(W=1.000000,X=1.000000,Y=1.000000,Z=1.000000)
      GrayedOut=(W=0.750000,X=0.750000,Y=0.750000,Z=0.750000)
 }

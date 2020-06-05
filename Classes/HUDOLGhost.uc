@@ -4,27 +4,27 @@
     Creation date: 09/04/2004 21:32
     Copyright (c) 2004, Greg Laabs
 
-    The Heads up Display for the SlaveMaster gametype. Handles displaying the
-    location of "tagged" players, as well as changing the hud for slaves.
-    Slaves' HUDS show the inventory of their masters, as they have no inventory
+    The Heads up Display for the Ghost Master gametype. Handles displaying the
+    location of "tagged" players, as well as changing the hud for ghosts.
+    Ghosts' HUDS show the inventory of their masters, as they have no inventory
     themselves.
 
 *******************************************************************************/
 
 class HUDOLGhost extends HudCDeathMatch;
 
-var()   Texture             SlaveBeaconMat;
-var()   Color               SlaveBeaconColor;
+var()   Texture             GhostBeaconMat;
+var()   Color               GhostBeaconColor;
 var()   Texture             MasterBeaconMat;
 var()   Color               MasterBeaconColor;
 var()   Texture             TaggedBeaconMat;
 var()   Color               TaggedBeaconColor;
 var()   Color               ObstructedTaggedColor;
 
-// For number of slaves / favor
-var() NumericWidget myOtherSlavesNum;
-var() NumericWidget mySlaveMasterNum;
-var() NumericWidget mySlavesNum;
+// For number of ghosts / favor
+var() NumericWidget myOtherGhostsNum;
+var() NumericWidget myGhostMasterNum;
+var() NumericWidget myGhostsNum;
 var() NumericWidget myFavor;
 var() SpriteWidget FavorIcon,FavorBackgroundDisc;
 
@@ -57,12 +57,12 @@ simulated function PostBeginPlay()
     SetTimer(1.0, True);
 }
 
-simulated function bool PRIIsSlave(PlayerReplicationInfo PRI)
+simulated function bool PRIIsGhost(PlayerReplicationInfo PRI)
 {
-    local OLGhostPlayerReplicationInfo SlaveInfo;
+    local OLGhostPlayerReplicationInfo GhostInfo;
 
-    SlaveInfo = OLGhostPlayerReplicationInfo( PRI );
-    if(SlaveInfo != none && SlaveInfo.bIsSlave)
+    GhostInfo = OLGhostPlayerReplicationInfo( PRI );
+    if(GhostInfo != none && GhostInfo.bIsGhost)
         return true;
     else
         return false;
@@ -70,11 +70,11 @@ simulated function bool PRIIsSlave(PlayerReplicationInfo PRI)
 
 simulated function PlayerReplicationInfo PRIGetMaster(PlayerReplicationInfo PRI)
 {
-    local OLGhostPlayerReplicationInfo SlaveInfo;
+    local OLGhostPlayerReplicationInfo GhostInfo;
 
-    SlaveInfo = OLGhostPlayerReplicationInfo( PRI );
+    GhostInfo = OLGhostPlayerReplicationInfo( PRI );
 
-    return SlaveInfo.Master;
+    return GhostInfo.Master;
 }
 
 simulated function DrawTaggedPlayers(Canvas C)
@@ -83,25 +83,25 @@ simulated function DrawTaggedPlayers(Canvas C)
     local vector        ScreenPos;
     local vector        CamLoc;
     local rotator       CamRot;
-    local OLGhostPlayerReplicationInfo SlavePRI;
+    local OLGhostPlayerReplicationInfo GhostPRI;
     local float     ProgressPct;
 
-    SlavePRI = OLGhostPlayerReplicationInfo(PawnOwnerPRI);
+    GhostPRI = OLGhostPlayerReplicationInfo(PawnOwnerPRI);
 
-    for(i=0;i<SlavePRI.numtags;i++)
+    for(i=0;i<GhostPRI.numtags;i++)
     {
         C.DrawColor = HudColorBlue;
         C.Style     = ERenderStyle.STY_Alpha;
         C.GetCameraLocation( CamLoc, CamRot );
-        ProgressPct = float(SlavePRI.TaggedPlayerHealth[i]) / 100;
+        ProgressPct = float(GhostPRI.TaggedPlayerHealth[i]) / 100;
 
-        if ( IsLocationVisible( C, SlavePRI.TaggedPlayerLocation[i], ScreenPos, CamLoc, CamRot ) )
+        if ( IsLocationVisible( C, GhostPRI.TaggedPlayerLocation[i], ScreenPos, CamLoc, CamRot ) )
         {
 
         }
-        else if ( IsTargetInFrontOfPlayer( C, SlavePRI.TaggedPlayerLocation[i], ScreenPos, CamLoc, CamRot ) )
+        else if ( IsTargetInFrontOfPlayer( C, GhostPRI.TaggedPlayerLocation[i], ScreenPos, CamLoc, CamRot ) )
         {
-            DrawLocationTracking_Obstructed( C, SlavePRI.TaggedPlayerLocation[i], false, CamLoc, ScreenPos );
+            DrawLocationTracking_Obstructed( C, GhostPRI.TaggedPlayerLocation[i], false, CamLoc, ScreenPos );
         }
         else
         {
@@ -238,18 +238,18 @@ static function ClipScreenCoords( Canvas C, out float X, out float Y, optional f
 
 simulated function CalculateHealth()
 {
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
     LastHealth = CurHealth;
 
-    if (!bIsSlave)
+    if (!bIsGhost)
     {
         if (Vehicle(PawnOwner) != None)
         {
@@ -270,23 +270,23 @@ simulated function CalculateHealth()
 
 simulated function UpdateRankAndSpread(Canvas C)
 {
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
     if ( (Scoreboard == None) || !Scoreboard.UpdateGRI() )
         return;
 
-    if( !bIsSlave )
+    if( !bIsGhost )
     {
-        mySlavesNum.Value = OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
-        mySlaveMasterNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumMasters - 1;
-        myOtherSlavesNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumSlaves - OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumSlaves;
+        myGhostsNum.Value = OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumGhosts;
+        myGhostMasterNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumMasters - 1;
+        myOtherGhostsNum.Value = OLGhostGameReplicationInfo(PlayerOwner.GameReplicationInfo).NumGhosts - OLGhostPlayerReplicationInfo(PawnOwnerPRI).NumGhosts;
 
         if( bShowPoints )
         {
@@ -294,10 +294,10 @@ simulated function UpdateRankAndSpread(Canvas C)
             MyScoreBackground.Tints[TeamIndex] = HudColorBlack;
             MyScoreBackground.Tints[TeamIndex].A = 150;
 
-            DrawNumericWidget (C, mySlaveMasterNum, DigitsBig);
+            DrawNumericWidget (C, myGhostMasterNum, DigitsBig);
             if ( C.ClipX >= 640 )
-                DrawNumericWidget (C, myOtherSlavesNum, DigitsBig);
-            DrawNumericWidget (C, mySlavesNum, DigitsBig);
+                DrawNumericWidget (C, myOtherGhostsNum, DigitsBig);
+            DrawNumericWidget (C, myGhostsNum, DigitsBig);
         }
     } else {
         myFavor.Value = OLGhostPlayerReplicationInfo(PawnOwnerPRI).Favor;
@@ -325,18 +325,18 @@ simulated function UpdateRankAndSpread(Canvas C)
 simulated function CalculateShield()
 {
     local xPawn P;
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
     LastShield = CurShield;
 
-    if (!bIsSlave)
+    if (!bIsGhost)
     {
         if (Vehicle(PawnOwner) != None)
             P = xPawn(Vehicle(PawnOwner).Driver);
@@ -361,16 +361,16 @@ simulated function CalculateShield()
 
 simulated function CalculateEnergy()
 {
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
-    if (!bIsSlave)
+    if (!bIsGhost)
     {
         if ( PawnOwner.Controller == None )
         {
@@ -390,7 +390,7 @@ simulated function CalculateEnergy()
 
 function DisplayEnemyName(Canvas C, PlayerReplicationInfo PRI)
 {
-    if( PRIIsSlave( PRI ) )
+    if( PRIIsGhost( PRI ) )
     {
         PlayerOwner.ReceiveLocalizedMessage(class'OLGhostNameMessage',1,PRI); // First part of name message
         if ( PRIGetMaster(PRI) != none )
@@ -408,10 +408,10 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
     if (P.PlayerReplicationInfo == none || OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo) == none)
         return;
 
-    if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master).IsPlayerTagged(P) )
+    if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsGhost && OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master).IsPlayerTagged(P) )
     {
         C.DrawColor = TaggedBeaconColor;
-        C.SetPos(ScreenLocX - 0.125 * SlaveBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
+        C.SetPos(ScreenLocX - 0.125 * GhostBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
         C.DrawTile(TaggedBeaconMat,
             0.25 * TaggedBeaconMat.USize,
             0.25 * TaggedBeaconMat.VSize,
@@ -420,10 +420,10 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
             TaggedBeaconMat.USize,
             TaggedBeaconMat.VSize);
     }
-    else if ( !OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(PawnOwnerPRI).IsPlayerTagged(P) )
+    else if ( !OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsGhost && OLGhostPlayerReplicationInfo(PawnOwnerPRI).IsPlayerTagged(P) )
     {
         C.DrawColor = TaggedBeaconColor;
-        C.SetPos(ScreenLocX - 0.125 * SlaveBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
+        C.SetPos(ScreenLocX - 0.125 * GhostBeaconMat.USize, ScreenLocY - 0.125 * TaggedBeaconMat.VSize);
         C.DrawTile(TaggedBeaconMat,
             0.25 * TaggedBeaconMat.USize,
             0.25 * TaggedBeaconMat.VSize,
@@ -432,11 +432,11 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
             TaggedBeaconMat.USize,
             TaggedBeaconMat.VSize);
     }
-    else if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsSlave && OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master == P.PlayerReplicationInfo )
+    else if ( OLGhostPlayerReplicationInfo(PawnOwnerPRI).bIsGhost && OLGhostPlayerReplicationInfo(PawnOwnerPRI).Master == P.PlayerReplicationInfo )
     {
         C.DrawColor = MasterBeaconColor;
         C.SetPos(ScreenLocX - 0.125 * MasterBeaconMat.USize, ScreenLocY - 0.125 * MasterBeaconMat.VSize);
-        C.DrawTile(SlaveBeaconMat,
+        C.DrawTile(GhostBeaconMat,
             0.25 * MasterBeaconMat.USize,
             0.25 * MasterBeaconMat.VSize,
             0.0,
@@ -449,12 +449,12 @@ simulated function DrawCustomBeacon(Canvas C, Pawn P, float ScreenLocX, float Sc
 function Timer()
 {
 
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
@@ -464,7 +464,7 @@ function Timer()
         || (PlayerOwner.IsSpectating() && (PlayerOwner.bBehindView || (PlayerOwner.ViewTarget == PlayerOwner))) )
         return;
 
-    if ( bIsSlave )
+    if ( bIsGhost )
         PlayerOwner.ReceiveLocalizedMessage( class'OLGhostHUDMessage', 0, Master );
 }
 
@@ -484,12 +484,12 @@ simulated function DrawWeaponBar( Canvas C )
     local OLGhostPlayerReplicationInfo.WeaponInfoStructTwo WIT;
     local Weapon W, PendingWeapon;
 
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
@@ -506,7 +506,7 @@ simulated function DrawWeaponBar( Canvas C )
 
     // fill:
 
-    if ( !bIsSlave )
+    if ( !bIsGhost )
     {
         for( Inv=PawnOwner.Inventory; Inv!=None; Inv=Inv.Inventory )
         {
@@ -590,8 +590,8 @@ simulated function DrawWeaponBar( Canvas C )
         IconOffset = (default.BarBorder[i].TextureCoords.X2 - default.BarBorder[i].TextureCoords.X1) *0.5 ;
         BarWeaponIcon[i].OffsetX =  IconOffset;
 
-        if(bIsSlave)
-        { // Use the grey color if this is a slave
+        if(bIsGhost)
+        { // Use the grey color if this is a ghost
             BarBorder[i].Tints[0] = HudColorNormal;
             BarBorder[i].Tints[1] = HudColorNormal;
         } else {
@@ -658,7 +658,7 @@ simulated function DrawWeaponBar( Canvas C )
                 }
             }
 
-            if (WIT.Weapon == PendingWeapon && !bIsSlave)
+            if (WIT.Weapon == PendingWeapon && !bIsGhost)
             {
                 // Change color to highlight and possibly changeTexture or animate it
                 BarBorder[i].Tints[TeamIndex] = HudColorHighLight;
@@ -668,7 +668,7 @@ simulated function DrawWeaponBar( Canvas C )
             }
             if ( ExtraWeapon[i] == 1 )
             {
-                if ( WIT.Weapon == PendingWeapon && !bIsSlave)
+                if ( WIT.Weapon == PendingWeapon && !bIsGhost)
                 {
                     BarBorder[i].Tints[0] = HudColorRed;
                     BarBorder[i].Tints[1] = HudColorBlue;
@@ -701,12 +701,12 @@ simulated function DrawHudPassA (Canvas C)
     local Pawn RealPawnOwner;
     local class<Ammunition> AmmoClass;
 
-    local bool bIsSlave;
+    local bool bIsGhost;
     local PlayerReplicationInfo Master;
 
-    if ( PRIIsSlave(PawnOwnerPRI) )
+    if ( PRIIsGhost(PawnOwnerPRI) )
     {
-        bIsSlave = true;
+        bIsGhost = true;
         Master = PRIGetMaster(PawnOwnerPRI);
     }
 
@@ -714,7 +714,7 @@ simulated function DrawHudPassA (Canvas C)
 
     if ( PawnOwner != None )
     {
-        if( !bIsSlave && bShowWeaponInfo && (PawnOwner.Weapon != None) )
+        if( !bIsGhost && bShowWeaponInfo && (PawnOwner.Weapon != None) )
         {
             if ( PawnOwner.Weapon.bShowChargingBar )
                 DrawChargeBar(C);
@@ -744,7 +744,7 @@ simulated function DrawHudPassA (Canvas C)
             DrawNumericWidget( C, DigitsAmmo, DigitsBig);
         }
 
-        if ( bShowWeaponBar && (PawnOwner.Weapon != None || bIsSlave) )
+        if ( bShowWeaponBar && (PawnOwner.Weapon != None || bIsGhost) )
             DrawWeaponBar(C);
 
         if( bShowPersonalInfo )
@@ -839,7 +839,7 @@ simulated function DrawHudPassA (Canvas C)
         DrawTimer(C);
 
     // Temp Drawwwith Hud Colors
-    if(bIsSlave)
+    if(bIsGhost)
     {
         HudBorderShield.Tints[0] = HudColorNormal;
         HudBorderShield.Tints[1] = HudColorNormal;
@@ -876,15 +876,15 @@ simulated function DrawHudPassA (Canvas C)
 
 defaultproperties
 {
-     myOtherSlavesNum=(RenderStyle=STY_Alpha,TextureScale=0.300000,DrawPivot=DP_MiddleLeft,OffsetX=30,OffsetY=170,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
-     mySlaveMasterNum=(RenderStyle=STY_Alpha,TextureScale=0.300000,DrawPivot=DP_MiddleLeft,OffsetX=30,OffsetY=132,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
-     mySlavesNum=(RenderStyle=STY_Alpha,TextureScale=0.490000,DrawPivot=DP_MiddleLeft,PosX=0.015000,OffsetX=70,OffsetY=94,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
+     myOtherGhostsNum=(RenderStyle=STY_Alpha,TextureScale=0.300000,DrawPivot=DP_MiddleLeft,OffsetX=30,OffsetY=170,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
+     myGhostMasterNum=(RenderStyle=STY_Alpha,TextureScale=0.300000,DrawPivot=DP_MiddleLeft,OffsetX=30,OffsetY=132,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
+     myGhostsNum=(RenderStyle=STY_Alpha,TextureScale=0.490000,DrawPivot=DP_MiddleLeft,PosX=0.015000,OffsetX=70,OffsetY=94,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
      myFavor=(RenderStyle=STY_Alpha,TextureScale=0.490000,DrawPivot=DP_MiddleLeft,PosX=0.015000,OffsetX=70,OffsetY=94,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
      FavorIcon=(WidgetTexture=Texture'OLGhostMasterTex.Icons.favor',RenderStyle=STY_Alpha,TextureCoords=(X1=0,Y1=0,X2=128,Y2=128),TextureScale=0.220000,OffsetX=0,OffsetY=134,ScaleMode=SM_Right,Scale=1.000000,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
      FavorBackgroundDisc=(WidgetTexture=Texture'HUDContent.Generic.HUD',RenderStyle=STY_Alpha,TextureCoords=(X1=119,Y1=258,X2=173,Y2=313),TextureScale=0.530000,OffsetY=59,ScaleMode=SM_Right,Scale=1.000000,Tints[0]=(B=255,G=255,R=255,A=255),Tints[1]=(B=255,G=255,R=255,A=255))
 
-     SlaveBeaconMat=TeamSymbols.TeamBeaconT
-     SlaveBeaconColor=(B=255,G=255,A=255)
+     GhostBeaconMat=TeamSymbols.TeamBeaconT
+     GhostBeaconColor=(B=255,G=255,A=255)
 
      MasterBeaconMat=TeamSymbols.TeamBeaconT
      MasterBeaconColor=(B=255,G=255,A=255)

@@ -8,11 +8,11 @@
 
 class OLGhostGameReplicationInfo extends GameReplicationInfo;
 
-var int NumSlaves;
+var int NumGhosts;
 var int NumMasters;
 
 replication
 {
     reliable if(bNetDirty && (Role == ROLE_Authority))
-        NumSlaves, NumMasters;
+        NumGhosts, NumMasters;
 }

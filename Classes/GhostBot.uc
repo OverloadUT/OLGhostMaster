@@ -10,14 +10,14 @@ class GhostBot extends xBot;
 
 event float Desireability(Pickup P)
 {
-    if ( OLGhostPawn(Pawn).bIsSlave )
+    if ( OLGhostPawn(Pawn).bIsGhost )
         return P.BotDesireability(OLGhostPawn(Pawn).Master.Pawn);
     return Super.Desireability(P);
 }
 
 event float SuperDesireability(Pickup P)
 {
-    if ( OLGhostPawn(Pawn).bIsSlave )
+    if ( OLGhostPawn(Pawn).bIsGhost )
         return P.BotDesireability(OLGhostPawn(Pawn).Master.Pawn);
     return Super.SuperDesireability(P);
 }

@@ -25,17 +25,17 @@ function Timer()
 
 function bool SetEnemy( Bot B, Pawn NewEnemy )
 {
-    local OLGhostGame slaveGame;
-    local OLGhostPawn slavePawn, slaveEnemy;
+    local OLGhostGame ghostGame;
+    local OLGhostPawn ghostPawn, ghostEnemy;
 
-    slaveGame = OLGhostGame(Level.Game);
-    slavePawn = OLGhostPawn(B.Pawn);
-    slaveEnemy = OLGhostPawn(NewEnemy);
+    ghostGame = OLGhostGame(Level.Game);
+    ghostPawn = OLGhostPawn(B.Pawn);
+    ghostEnemy = OLGhostPawn(NewEnemy);
 
     CheckEnemies(B);
 
-    // If this is not a slave and the enemy is not a slave, then behave normally.
-    if( !slavePawn.bIsSlave && !slaveEnemy.bIsSlave )
+    // If this is not a ghost and the enemy is not a ghost, then behave normally.
+    if( !ghostPawn.bIsGhost && !ghostEnemy.bIsGhost )
         return Super.SetEnemy(B, NewEnemy);
 
     if (IsValidEnemy(B,NewEnemy))
@@ -55,19 +55,19 @@ function bool SetEnemy( Bot B, Pawn NewEnemy )
 function CheckEnemies(Bot B)
 {
     local int i;
-    local OLGhostPawn slavePawn, slaveEnemy;
+    local OLGhostPawn ghostPawn, ghostEnemy;
 
-    slavePawn = OLGhostPawn(B.Pawn);
+    ghostPawn = OLGhostPawn(B.Pawn);
 
-    if (slavePawn != none)
+    if (ghostPawn != none)
     {
         for(i=0;i<8;i++)
         {
-            slaveEnemy = OLGhostPawn( Enemies[i] );
-            if (slaveEnemy == none)
+            ghostEnemy = OLGhostPawn( Enemies[i] );
+            if (ghostEnemy == none)
                 continue;
 
-            if (!slavePawn.bIsSlave && !slaveEnemy.bIsSlave)
+            if (!ghostPawn.bIsGhost && !ghostEnemy.bIsGhost)
                 continue;
 
             if ( !IsValidEnemy(B, Enemies[i]) )
@@ -78,23 +78,23 @@ function CheckEnemies(Bot B)
 
 function bool IsValidEnemy(Bot B, Pawn Enemy)
 {
-    local OLGhostGame slaveGame;
-    local OLGhostPawn slavePawn, slaveEnemy;
+    local OLGhostGame ghostGame;
+    local OLGhostPawn ghostPawn, ghostEnemy;
 
-    slaveGame = OLGhostGame(Level.Game);
-    slavePawn = OLGhostPawn(B.Pawn);
-    slaveEnemy = OLGhostPawn(Enemy);
+    ghostGame = OLGhostGame(Level.Game);
+    ghostPawn = OLGhostPawn(B.Pawn);
+    ghostEnemy = OLGhostPawn(Enemy);
 
     // If this is this bot's master, then return it can't be an enemy.
-    if ( slavePawn.bIsSlave && slavePawn.Master == slaveEnemy.controller )
+    if ( ghostPawn.bIsGhost && ghostPawn.Master == ghostEnemy.controller )
     {
         return false;
     }
 
-    // If this is a slave and the target is not a slave, check to see if they have been tagged.
-    if( slavePawn.bIsSlave && !slaveEnemy.bIsSlave )
+    // If this is a ghost and the target is not a ghost, check to see if they have been tagged.
+    if( ghostPawn.bIsGhost && !ghostEnemy.bIsGhost )
     {
-        if ( !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(slavePawn.PlayerReplicationInfo).Master).IsPlayerTagged(Enemy) )
+        if ( !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(ghostPawn.PlayerReplicationInfo).Master).IsPlayerTagged(Enemy) )
         {
             return true;
         }
@@ -104,8 +104,8 @@ function bool IsValidEnemy(Bot B, Pawn Enemy)
         }
     }
 
-    // If the target is a slave, then it can't be an enemy.
-    if( slaveEnemy.bIsSlave )
+    // If the target is a ghost, then it can't be an enemy.
+    if( ghostEnemy.bIsGhost )
     {
         return false;
     }

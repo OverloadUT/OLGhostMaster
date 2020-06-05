@@ -10,7 +10,7 @@ class OLGhostGame extends xDeathMatch;
 
 //#exec AUDIO IMPORT FILE="Sounds\Liberated.wav" NAME="liberated" Package=OLGhostAnnouncer
 //#exec AUDIO IMPORT FILE="Sounds\Insurrection.wav" NAME="insurrection" Package=OLGhostAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\Enslaved.wav" NAME="enslaved" Package=OLGhostAnnouncer
+//#exec AUDIO IMPORT FILE="Sounds\Ghosted.wav" NAME="ghosted" Package=OLGhostAnnouncer
 //#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLGhostAnnouncer
 //#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLGhostAnnouncer
 // #exec OBJ LOAD File="..\Textures\OLGhostMasterTex.utx" Package=OLGhostMaster
@@ -33,8 +33,8 @@ class OLGhostGame extends xDeathMatch;
 
 var() config int FavorTarget;
 var() config bool bRewardSystem;
-var() config bool bSlavesEthereal;
-var() config float SlaveSpeedMultiplier;
+var() config bool bGhostsEthereal;
+var() config float GhostSpeedMultiplier;
 var localized string FavorPropText;
 var localized string FavorDescText;
 var localized string RewardPropText;
@@ -49,21 +49,13 @@ static function PrecacheGameAnnouncements(AnnouncerVoice V, bool bRewardSounds)
     Super.PrecacheGameAnnouncements(V,bRewardSounds);
     if ( !bRewardSounds )
     {
-        V.PrecacheFallbackPackage("OLGhostAnnouncer",'enslaved');
+        // V.PrecacheFallbackPackage("OLGhostAnnouncer",'ghosted'); (doesn't exist)
         V.PrecacheFallbackPackage("OLGhostAnnouncer",'liberated');
         V.PrecacheFallbackPackage("OLGhostAnnouncer",'earnedfreedom');
-        V.PrecacheFallbackPackage("OLGhostAnnouncer",'Enslaved');
+        // V.PrecacheFallbackPackage("OLGhostAnnouncer",'Ghosted'); (doesn't exist)
         V.PrecacheFallbackPackage("OLGhostAnnouncer",'overloadjoined');
     }
 }
-
-/*
-// Just a little hack that should make it so that OLGhost forces the OLGhostAnnouncer package to download.
-function sound UnusedFunction()
-{
-    return sound'OLGhostAnnouncer.enslaved';
-}
-*/
 
 event InitGame( string Options, out string Error )
 {
@@ -85,7 +77,7 @@ event PlayerController Login( string Portal, string Options, out string Error )
         xPlayer(pc).ComboNameList[3] = ""; // Remove invis combo from players list.
     }
 
-    UpdateSlaveCount();
+    UpdateGhostCount();
 
     return pc;
 }
@@ -134,10 +126,10 @@ function string RecommendCombo(string ComboName)
 function Logout(Controller Exiting)
 {
     if( OLGhostPlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master != none )
-        UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master.Owner) );
+        UpdateGhostCount( Controller(OLGhostPlayerReplicationInfo(Exiting.PlayerReplicationInfo).Master.Owner) );
 
-    FreeSlaves(Exiting);
-    UpdateSlaveCount();
+    FreeGhosts(Exiting);
+    UpdateGhostCount();
     CheckScore(none);
 
     Super.Logout(Exiting);
@@ -149,10 +141,10 @@ function bool BecomeSpectator(PlayerController P)
         return false;
 
     if( OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master != none )
-        UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
+        UpdateGhostCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
 
-    FreeSlaves(P);
-    UpdateSlaveCount();
+    FreeGhosts(P);
+    UpdateGhostCount();
     CheckScore(none);
     return true;
 }
@@ -163,11 +155,11 @@ function bool AllowBecomeActivePlayer(PlayerController P)
     {
         if ( OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master == none )
         {
-            OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave = false;
-            UpdateSlaveCount();
+            OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsGhost = false;
+            UpdateGhostCount();
         }
         else
-            UpdateSlaveCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
+            UpdateGhostCount( Controller(OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).Master.Owner) );
         return true;
     }
     return false;
@@ -193,7 +185,7 @@ function Bot SpawnBot(optional string botName)
         NewBot.PawnClass = class'OLGhostPawn';
     }
 
-    UpdateSlaveCount();
+    UpdateGhostCount();
 
     return NewBot;
 }
@@ -207,8 +199,8 @@ function Killed( Controller Killer, Controller Killed, Pawn KilledPawn, class<Da
             && Killed.PlayerReplicationInfo != none
             && OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo) != none
             && OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy != none
-            && !OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).bIsSlave
-            && !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.PlayerReplicationInfo).bIsSlave )
+            && !OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).bIsGhost
+            && !OLGhostPlayerReplicationInfo(OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.PlayerReplicationInfo).bIsGhost )
     {
         TheRealKiller = OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy.Controller;
         OLGhostPlayerReplicationInfo(Killed.PlayerReplicationInfo).LastDamagedBy = none;
@@ -222,24 +214,24 @@ function Killed( Controller Killer, Controller Killed, Pawn KilledPawn, class<Da
 
 function NotifyKilled(Controller Killer, Controller Other, Pawn OtherPawn)
 {
-    // If a slave killed his master, it's an insurrection!
+    // If a ghost killed their master, it's an insurrection!
     if (Killer != none && OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo) != none)
     {
-        if(OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).Master == Other.PlayerReplicationInfo )
+        if(OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsGhost && OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).Master == Other.PlayerReplicationInfo )
         {
             ScoreEvent(Killer.PlayerReplicationInfo,2,"insurrection");
-            FreeSlave(Killer, 'insurrection');
-            MakeSlave(Killer, Other);
+            FreeGhost(Killer, 'insurrection');
+            MakeGhost(Killer, Other);
         }
-        else if (Killer != none && Killer != Other && !OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsSlave && !OLGhostPlayerReplicationInfo(Other.PlayerReplicationInfo).bIsSlave)
+        else if (Killer != none && Killer != Other && !OLGhostPlayerReplicationInfo(Killer.PlayerReplicationInfo).bIsGhost && !OLGhostPlayerReplicationInfo(Other.PlayerReplicationInfo).bIsGhost)
         {
-            MakeSlave(Killer, Other);
+            MakeGhost(Killer, Other);
         }
 
         OLGhostPlayerReplicationInfo(Other.PlayerReplicationInfo).LastDamagedBy = none;
     }
 
-    FreeSlaves(Other);
+    FreeGhosts(Other);
 
     Super.NotifyKilled(Killer, Other, OtherPawn);
 }
@@ -259,11 +251,11 @@ function ScoreKill(Controller Killer, Controller Other)
     }
     else if ( killer != none && killer.PlayerReplicationInfo != None )
     {
-        bonusscore = OLGhostPlayerReplicationInfo(other.PlayerReplicationInfo).numslaves;
+        bonusscore = OLGhostPlayerReplicationInfo(other.PlayerReplicationInfo).numghosts;
         Killer.PlayerReplicationInfo.Score += 1 + bonusscore;
         Killer.PlayerReplicationInfo.NetUpdateTime = Level.TimeSeconds - 1;
         Killer.PlayerReplicationInfo.Kills++;
-        ScoreEvent(Killer.PlayerReplicationInfo,1 + bonusscore,"slavemaster_frag");
+        ScoreEvent(Killer.PlayerReplicationInfo,1 + bonusscore,"ghostmaster_frag");
     }
 
     if ( GameRulesModifiers != None )
@@ -301,11 +293,11 @@ function bool CheckEndGame(PlayerReplicationInfo Winner, string Reason)
 
     if (Winner == none)
     {
-        // find winner - top score who is not a slave
+        // find winner - top score who is not a ghost
         for ( P=Level.ControllerList; P!=None; P=P.nextController )
             if ( P.bIsPlayer
                 && !P.PlayerReplicationInfo.bOutOfLives
-                && !OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsSlave
+                && !OLGhostPlayerReplicationInfo(P.PlayerReplicationInfo).bIsGhost
                 && ((Winner == None) || (P.PlayerReplicationInfo.Score >= Winner.Score)) )
             {
                 Winner = P.PlayerReplicationInfo;
@@ -389,12 +381,12 @@ function CheckScore(PlayerReplicationInfo Scorer)
         return;
     }
 
-    // Check if someone owns all the slaves.
+    // Check if someone owns all the ghosts.
     for ( C=Level.ControllerList; C!=None; C=C.NextController )
     {
         if ( (OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo) != None)
-          && (!OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).bIsSlave)
-          && (OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).numslaves >= TargetNum ) )
+          && (!OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).bIsGhost)
+          && (OLGhostPlayerReplicationInfo(C.PlayerReplicationInfo).numghosts >= TargetNum ) )
         {
             EndGame(C.PlayerReplicationInfo,"LastMan");
             return;
@@ -419,23 +411,23 @@ function CheckScore(PlayerReplicationInfo Scorer)
     }
 }
 
-function MakeSlave(Controller Master, Controller Slave)
+function MakeGhost(Controller Master, Controller Ghost)
 {
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = true;
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = Master.PlayerReplicationInfo;
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
-    UpdateSlaveCount(Master);
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).bIsGhost = true;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Master = Master.PlayerReplicationInfo;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Favor = 0;
+    UpdateGhostCount(Master);
 
-    // Dont let Slaves use or pickup Adrenaline.
+    // Dont let Ghosts use or pickup Adrenaline.
     // Also, make sure they have at most 99 adrenaline, so they can't perform combos.
-    Slave.bAdrenalineEnabled = false;
-    Slave.Adrenaline = FMin(99, Slave.Adrenaline);
+    Ghost.bAdrenalineEnabled = false;
+    Ghost.Adrenaline = FMin(99, Ghost.Adrenaline);
 
-    if ( PlayerController(Slave) != none )
-        PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 0);
+    if ( PlayerController(Ghost) != none )
+        PlayerController(Ghost).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 0);
 }
 
-function FreeSlaves(Controller Master)
+function FreeGhosts(Controller Master)
 {
     local int i;
 
@@ -445,67 +437,67 @@ function FreeSlaves(Controller Master)
             continue;
 
         if( /*!GameReplicationInfo.PRIArray[i].bOnlySpectator*/
-            OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave
+            OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsGhost
             && Controller(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
         {
-            FreeSlave( Controller(GameReplicationInfo.PRIArray[i].Owner), 'masterdied' );
+            FreeGhost( Controller(GameReplicationInfo.PRIArray[i].Owner), 'masterdied' );
         }
     }
 }
 
-function Freeslave(Controller Slave, optional name reason)
+function FreeGhost(Controller Ghost, optional name reason)
 {
-    local OLGhostPawn SlavePawn;
+    local OLGhostPawn GhostPawn;
     local PlayerReplicationInfo oldmaster;
 
-    SlavePawn = OLGhostPawn(Slave.Pawn);
+    GhostPawn = OLGhostPawn(Ghost.Pawn);
 
-    oldmaster = OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master;
+    oldmaster = OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Master;
 
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).bIsSlave = false;
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Master = none;
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).FavorPending = OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor;
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor = 0;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).bIsGhost = false;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Master = none;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).FavorPending = OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Favor;
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Favor = 0;
 
     // Re-enable adrenaline
-    Slave.bAdrenalineEnabled = true;
+    Ghost.bAdrenalineEnabled = true;
 
-    if ( PlayerController(Slave) != none )
+    if ( PlayerController(Ghost) != none )
     {
         if (reason == 'favor')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 2);
+            PlayerController(Ghost).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 2);
         else if (reason == 'masterdied')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
+            PlayerController(Ghost).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
         else if (reason == 'insurrection')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 3);
+            PlayerController(Ghost).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 3);
         else
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
+            PlayerController(Ghost).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostMessage', 1);
     }
     if (PlayerController(oldmaster.owner) != none)
     {
         if (reason == 'favor')
-            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostFreedomMessage', 0, Slave.PlayerReplicationInfo);
+            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostFreedomMessage', 0, Ghost.PlayerReplicationInfo);
     }
 
-    if (SlavePawn != none && Slave.bIsPlayer && !Slave.PlayerReplicationInfo.bOnlySpectator)
+    if (GhostPawn != none && Ghost.bIsPlayer && !Ghost.PlayerReplicationInfo.bOnlySpectator)
     {
-        SlavePawn.FreeSlave();
+        GhostPawn.FreeGhost();
     }
 
-    RestartPlayer(Slave);
+    RestartPlayer(Ghost);
 
-    UpdateSlaveCount( controller(oldmaster.owner) );
+    UpdateGhostCount( controller(oldmaster.owner) );
 }
 
-function UpdateSlaveCount(optional Controller Master)
+function UpdateGhostCount(optional Controller Master)
 {
     local int i;
-    local int NumSlaves;
-    local int NumTotalSlaves;
+    local int NumGhosts;
+    local int NumTotalGhosts;
     local int NumTotalMasters;
 
-    NumSlaves = 0;
-    NumTotalSlaves = 0;
+    NumGhosts = 0;
+    NumTotalGhosts = 0;
     NumTotalMasters = 0;
 
     for(i=0;i<GameReplicationInfo.PRIArray.Length;i++)
@@ -513,17 +505,17 @@ function UpdateSlaveCount(optional Controller Master)
         if(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]) == none || OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bOnlySpectator)
             continue;
 
-        if(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsSlave)
+        if(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).bIsGhost)
         {
-            NumTotalSlaves++;
+            NumTotalGhosts++;
             if(Master != none && Controller(OLGhostPlayerReplicationInfo(GameReplicationInfo.PRIArray[i]).Master.Owner) == Master)
-                NumSlaves++;
+                NumGhosts++;
         } else
             NumTotalMasters++;
     }
     if (Master != none)
-        OLGhostPlayerReplicationInfo(Master.PlayerReplicationInfo).NumSlaves = NumSlaves;
-    OLGhostGameReplicationInfo(GameReplicationInfo).NumSlaves = NumTotalSlaves;
+        OLGhostPlayerReplicationInfo(Master.PlayerReplicationInfo).NumGhosts = NumGhosts;
+    OLGhostGameReplicationInfo(GameReplicationInfo).NumGhosts = NumTotalGhosts;
     OLGhostGameReplicationInfo(GameReplicationInfo).NumMasters = NumTotalMasters;
 
     if (Master != none && Master.PlayerReplicationInfo != none)
@@ -532,7 +524,7 @@ function UpdateSlaveCount(optional Controller Master)
         CheckScore(none);
 }
 
-function SlaveTaggedPlayer(pawn TaggedPawn, Controller Tagger)
+function GhostTaggedPlayer(pawn TaggedPawn, Controller Tagger)
 {
     local Controller C;
 
@@ -560,7 +552,7 @@ function SlaveTaggedPlayer(pawn TaggedPawn, Controller Tagger)
         PlayerController(OLGhostPlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLGhostTagMessage', 3, TaggedPawn.PlayerReplicationInfo, Tagger.PlayerReplicationInfo);
 }
 
-// Called when a player respawns.  This is when I set up the slave stuff
+// Called when a player respawns.  This is when I set up the ghost stuff
 function RestartPlayer( Controller aPlayer )
 {
     local OLGhostPawn SP;
@@ -568,35 +560,35 @@ function RestartPlayer( Controller aPlayer )
     Super.RestartPlayer(aPlayer);
 
     SP = OLGhostPawn(aPlayer.Pawn);
-    SP.bIsSlave = OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).bIsSlave;
-    if (SP.bIsSlave)
+    SP.bIsGhost = OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).bIsGhost;
+    if (SP.bIsGhost)
         SP.Master = Controller(OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).Master.Owner);
     else
         SP.Master = none;
 
-    if (SP.bIsSlave)
+    if (SP.bIsGhost)
     {
-        SP.MakeSlave();
+        SP.MakeGhost();
     } else {
         if (bRewardSystem)
             SP.RewardForFavor(OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending);
         OLGhostPlayerReplicationInfo(aPlayer.PlayerReplicationInfo).FavorPending = 0;
     }
-    UpdateSlaveCount();
+    UpdateGhostCount();
 }
 
-function AddFavor(controller Slave, int amount)
+function AddFavor(controller Ghost, int amount)
 {
-    OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor += amount;
-    CheckFavor(Slave);
+    OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Favor += amount;
+    CheckFavor(Ghost);
 }
 
-function CheckFavor(controller Slave)
+function CheckFavor(controller Ghost)
 {
-    if (OLGhostPlayerReplicationInfo(Slave.PlayerReplicationInfo).Favor >= FavorTarget)
+    if (OLGhostPlayerReplicationInfo(Ghost.PlayerReplicationInfo).Favor >= FavorTarget)
     {
-        ScoreEvent(Slave.PlayerReplicationInfo,3,"earned_freedom");
-        FreeSlave(Slave,'favor');
+        ScoreEvent(Ghost.PlayerReplicationInfo,3,"earned_freedom");
+        FreeGhost(Ghost,'favor');
     }
 }
 
@@ -606,19 +598,19 @@ function bool PickupQuery( Pawn Other, Pickup item )
     local bool bDidPickup;
     local Pawn MasterPawn;
     local inventory copy, inv;
-    local OLGhostPawn SlavePawn;
+    local OLGhostPawn GhostPawn;
     local int firemode;
     local int Favor;
 
-    SlavePawn = OLGhostPawn(Other);
+    GhostPawn = OLGhostPawn(Other);
 
     if (item == none || Other == none)
         return false;
 
-    // Check if the picker-upper is a slave
-    if( SlavePawn.bIsSlave )
+    // Check if the picker-upper is a ghost
+    if( GhostPawn.bIsGhost )
     {
-        MasterPawn = SlavePawn.Master.Pawn;
+        MasterPawn = GhostPawn.Master.Pawn;
 
         if ( RedeemerWarhead(MasterPawn) != none )
             MasterPawn = RedeemerWarhead(MasterPawn).OldPawn;
@@ -696,8 +688,8 @@ function bool PickupQuery( Pawn Other, Pickup item )
             {
                 if (MasterPawn != none)
                     item.AnnouncePickup(MasterPawn);
-                if (SlavePawn != none)
-                    item.AnnouncePickup(SlavePawn);
+                if (GhostPawn != none)
+                    item.AnnouncePickup(GhostPawn);
                 MasterPawn.PlaySound( item.PickupSound,SLOT_Interact );
 
                 if (PlayerController(MasterPawn.Controller) != none)
@@ -708,19 +700,19 @@ function bool PickupQuery( Pawn Other, Pickup item )
                 item.SetRespawn();
             }
         }
-        return false; // Slave does not get to pick up items no matter what.
+        return false; // Ghost does not get to pick up items no matter what.
     }
 
     if ( (GameRulesModifiers != None) && GameRulesModifiers.OverridePickupQuery(Other, item, bAllowPickup) )
         if (bAllowPickup == 1)
         {
-            BlankSlaveGiftMessage(Other);
+            BlankGhostGiftMessage(Other);
             return true;
         }
 
     if ( Other.Inventory == None )
     {
-        BlankSlaveGiftMessage(Other);
+        BlankGhostGiftMessage(Other);
         return true;
     }
     else
@@ -803,11 +795,11 @@ function bool MasterPickupQuery( Pawn Other, Pickup item, optional out inventory
     }
 }
 
-// Sends a blank "SlaveGiftMessage" so that the "A Gift From XXX" doesn't linger
+// Sends a blank "GhostGiftMessage" so that the "A Gift From XXX" doesn't linger
 // after you pick up an item yourself
-function BlankSlaveGiftMessage(Pawn Other)
+function BlankGhostGiftMessage(Pawn Other)
 {
-    // Send a blank SlaveGiftMessage to clear any one currently there.
+    // Send a blank GhostGiftMessage to clear any one currently there.
     if (PlayerController(Other.Controller) != none)
         PlayerController(Other.Controller).ReceiveLocalizedMessage(class'OLGhostGiftMessage',1);
 }
@@ -816,13 +808,13 @@ function int ReduceDamage( int Damage, pawn injured, pawn instigatedBy, vector H
 {
     local int EndDamage;
 
-    // Slaves can't take damage
-    if( OLGhostPawn(injured).bIsSlave )
+    // Ghosts can't take damage
+    if( OLGhostPawn(injured).bIsGhost )
         return 0;
 
-    // Slaves can only deal damage to their masters.
+    // Ghosts can only deal damage to their masters.
     // If they kill their master, it's an insurrection!
-    if ( instigatedBy != none && OLGhostPawn(instigatedBy).bIsSlave && OLGhostPlayerReplicationInfo(instigatedBy.PlayerReplicationInfo).Master != injured.PlayerReplicationInfo)
+    if ( instigatedBy != none && OLGhostPawn(instigatedBy).bIsGhost && OLGhostPlayerReplicationInfo(instigatedBy.PlayerReplicationInfo).Master != injured.PlayerReplicationInfo)
         return 0;
 
     // Regular damage evaluation
@@ -844,7 +836,7 @@ static function FillPlayInfo(PlayInfo PI)
 
     PI.AddSetting(default.GameGroup, "FavorTarget", default.FavorPropText, 40, 1, "Text","10;10:500",,,True);
     PI.AddSetting(default.GameGroup, "bRewardSystem", default.RewardPropText, 40, 1, "Check","",,,True);
-    PI.AddSetting(default.GameGroup, "bSlavesEthereal", default.EtherealPropText, 40, 1, "Check","",,,True);
+    PI.AddSetting(default.GameGroup, "bGhostsEthereal", default.EtherealPropText, 40, 1, "Check","",,,True);
 }
 
 static event string GetDescriptionText(string PropName)
@@ -853,7 +845,7 @@ static event string GetDescriptionText(string PropName)
     {
         case "FavorTarget": return default.FavorDescText;
         case "bRewardSystem": return default.RewardDescText;
-        case "bSlavesEthereal": return default.EtherealDescText;
+        case "bGhostsEthereal": return default.EtherealDescText;
     }
 
     return Super.GetDescriptionText(PropName);
@@ -877,8 +869,8 @@ function GetServerDetails(out ServerResponseLine ServerState)
 
     i = ServerState.ServerInfo.Length;
     ServerState.ServerInfo.Length = i + 1;
-    ServerState.ServerInfo[i].Key = "SlavesEthereal";
-    ServerState.ServerInfo[i].Value = Locs(bSlavesEthereal);
+    ServerState.ServerInfo[i].Key = "GhostsEthereal";
+    ServerState.ServerInfo[i].Value = Locs(bGhostsEthereal);
 }
 
 static function array<string> GetAllLoadHints(optional bool bThisClassOnly)
@@ -910,10 +902,10 @@ defaultproperties
      bRewardSystem=True
      RewardPropText="Use Reward System"
      RewardDescText="Rewards ghosts for serving their master well. When ghosts become free, they are awarded with weapons and health depending on how much favor they earned."
-     bSlavesEthereal=False
+     bGhostsEthereal=False
      EtherealPropText="Ghosts are Ethereal"
      EtherealDescText="Makes ghosts ethereal. Projectiles and other players pass right through them."
-     SlaveSpeedMultiplier=1.3
+     GhostSpeedMultiplier=1.3
      FavorTarget=100
      FavorPropText="Favor Needed"
      FavorDescText="Defines the amount of favor ghosts need to earn their mortal bodies."

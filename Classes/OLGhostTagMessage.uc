@@ -12,8 +12,8 @@ var() sound YouAreTaggedSound;
 var() localized string YouAreTaggedMessage;
 var() sound YouTaggedSound;
 var() localized string YouTaggedMessage;
-var() sound YourSlaveTaggedSound;
-var() localized string YourSlaveTaggedMessage;
+var() sound YourGhostTaggedSound;
+var() localized string YourGhostTaggedMessage;
 var() localized string exclam;
 
 static function string GetString(
@@ -34,7 +34,7 @@ static function string GetString(
             break;
         case 3:
             if (RelatedPRI_1 != none && RelatedPRI_2 != none && RelatedPRI_1.PlayerName != "" && RelatedPRI_2.PlayerName != "")
-                return RelatedPRI_1.PlayerName@default.YourSlaveTaggedMessage@RelatedPRI_2.PlayerName$default.exclam;
+                return RelatedPRI_1.PlayerName@default.YourGhostTaggedMessage@RelatedPRI_2.PlayerName$default.exclam;
             break;
     }
     return "";
@@ -65,7 +65,7 @@ static simulated function ClientReceive(
 
         case 3:
             if (RelatedPRI_1 != none && RelatedPRI_2 != none && RelatedPRI_1.PlayerName != "" && RelatedPRI_2.PlayerName != "")
-                TheSound = Default.YourSlaveTaggedSound;
+                TheSound = Default.YourGhostTaggedSound;
             break;
     }
 
@@ -78,8 +78,8 @@ defaultproperties
      YouAreTaggedMessage="You have been tagged!"
      YouTaggedSound=Sound'GameSounds.DDAverted'
      YouTaggedMessage="You tagged"
-     YourSlaveTaggedSound=Sound'GameSounds.DDAverted'
-     YourSlaveTaggedMessage="has been tagged by your ghost,"
+     YourGhostTaggedSound=Sound'GameSounds.DDAverted'
+     YourGhostTaggedMessage="has been tagged by your ghost,"
      Exclam="!"
      bIsUnique=True
      bFadeMessage=True

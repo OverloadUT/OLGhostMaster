@@ -4,7 +4,7 @@
 class ACTION_MakeGhost extends ScriptedAction;
 
 var(Action) name MasterTag;
-var(Action) bool bMakeSlave;
+var(Action) bool bMakeGhost;
 
 function bool InitActionFor(ScriptedController C)
 {
@@ -21,8 +21,8 @@ function bool InitActionFor(ScriptedController C)
     else
         OLGhostPawn(C.Pawn).Master = none;
 
-    OLGhostPawn(C.Pawn).bIsSlave = bMakeSlave;
-    OLGhostPawn(C.Pawn).MakeSlave();
+    OLGhostPawn(C.Pawn).bIsGhost = bMakeGhost;
+    OLGhostPawn(C.Pawn).MakeGhost();
 
     return false;
 }
