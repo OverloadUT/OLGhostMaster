@@ -31,7 +31,7 @@ defaultproperties
      ShakeOffsetMag=(Z=-2.000000)
      ShakeOffsetRate=(Z=1000.000000)
      ShakeOffsetTime=1.800000
-     ProjectileClass=OLSlave.OLSlaveTaggerBall
+     ProjectileClass=OLGhostMaster.OLSlaveTaggerBall
      BotRefireRate=1.000000
 //     FlashEmitterClass=XEffects.BioMuzFlash1st
 }

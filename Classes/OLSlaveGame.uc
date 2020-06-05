@@ -13,7 +13,7 @@ class OLSlaveGame extends xDeathMatch;
 //#exec AUDIO IMPORT FILE="Sounds\Enslaved.wav" NAME="enslaved" Package=OLSlaveAnnouncer
 //#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLSlaveAnnouncer
 //#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLSlaveAnnouncer
-#exec OBJ LOAD File="..\Textures\OLSlaveTex.utx" Package=OLSlave
+// #exec OBJ LOAD File="..\Textures\OLGhostMasterTex.utx" Package=OLGhostMaster
 #exec OBJ LOAD File="..\Sounds\OLSlaveAnnouncer.uax"
 
 //#exec AUDIO IMPORT FILE="Sounds\tut_01.wav" Name="tut_01"
@@ -490,7 +490,7 @@ function MakeSlave(Controller Master, Controller Slave)
     Slave.Adrenaline = FMin(99, Slave.Adrenaline);
 
     if ( PlayerController(Slave) != none )
-        PlayerController(Slave).ReceiveLocalizedMessage(class'OLSlave.OLSlaveMessage', 0);
+        PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 0);
 }
 
 function FreeSlaves(Controller Master)
@@ -531,18 +531,18 @@ function Freeslave(Controller Slave, optional name reason)
     if ( PlayerController(Slave) != none )
     {
         if (reason == 'favor')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLSlave.OLSlaveMessage', 2);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 2);
         else if (reason == 'masterdied')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLSlave.OLSlaveMessage', 1);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 1);
         else if (reason == 'insurrection')
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLSlave.OLSlaveMessage', 3);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 3);
         else
-            PlayerController(Slave).ReceiveLocalizedMessage(class'OLSlave.OLSlaveMessage', 1);
+            PlayerController(Slave).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveMessage', 1);
     }
     if (PlayerController(oldmaster.owner) != none)
     {
         if (reason == 'favor')
-            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLSlave.OLSlaveFreedomMessage', 0, Slave.PlayerReplicationInfo);
+            PlayerController(oldmaster.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveFreedomMessage', 0, Slave.PlayerReplicationInfo);
     }
 
     if (SlavePawn != none && Slave.bIsPlayer && !Slave.PlayerReplicationInfo.bOnlySpectator)
@@ -608,14 +608,14 @@ function SlaveTaggedPlayer(pawn TaggedPawn, Controller Tagger)
 
     // Send message to the tagged player
     if( PlayerController(TaggedPawn.Controller) != none )
-        PlayerController(TaggedPawn.Controller).ReceiveLocalizedMessage(class'OLSlave.OLSlaveTagMessage', 1);
+        PlayerController(TaggedPawn.Controller).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 1);
     // Send message to the tagger
     if( PlayerController(Tagger) != none )
-        PlayerController(Tagger).ReceiveLocalizedMessage(class'OLSlave.OLSlaveTagMessage', 2, TaggedPawn.PlayerReplicationInfo);
+        PlayerController(Tagger).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 2, TaggedPawn.PlayerReplicationInfo);
     // Send message to the master
     if( OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master != none
         && PlayerController(OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner) != none )
-        PlayerController(OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner).ReceiveLocalizedMessage(class'OLSlave.OLSlaveTagMessage', 3, TaggedPawn.PlayerReplicationInfo, Tagger.PlayerReplicationInfo);
+        PlayerController(OLSlavePlayerReplicationInfo(Tagger.PlayerReplicationInfo).master.owner).ReceiveLocalizedMessage(class'OLGhostMaster.OLSlaveTagMessage', 3, TaggedPawn.PlayerReplicationInfo, Tagger.PlayerReplicationInfo);
 }
 
 // Called when a player respawns.  This is when I set up the slave stuff
@@ -955,16 +955,16 @@ static function array<string> GetAllLoadHints(optional bool bThisClassOnly)
 
 defaultproperties
 {
-     DMSquadClass=OLSlave.OLSlaveSquadAI
+     DMSquadClass=OLGhostMaster.OLSlaveSquadAI
      GameName="Slave Master"
      Acronym="SLV"
-     DecoTextName="OLSlave.OLSlaveGame"
+     DecoTextName="OLGhostMaster.OLSlaveGame"
      Description="When you are killed, you become your killer's slave. If your master dies, you are free. You can also free yourself by helping your master."
-     HUDType="OLSlave.HUDOLSlave"
-     MutatorClass="OLSlave.OLSlaveMutator"
-     ScoreBoardType="OLSlave.OLSlaveScoreBoard"
-     GameReplicationInfoClass=OLSlave.OLSlaveGameReplicationInfo
-     DeathMessageClass=OLSlave.OLSlaveDeathMessage
+     HUDType="OLGhostMaster.HUDOLSlave"
+     MutatorClass="OLGhostMaster.OLSlaveMutator"
+     ScoreBoardType="OLGhostMaster.OLSlaveScoreBoard"
+     GameReplicationInfoClass=OLGhostMaster.OLSlaveGameReplicationInfo
+     DeathMessageClass=OLGhostMaster.OLSlaveDeathMessage
      bRewardSystem=True
      RewardPropText="Use Reward System"
      RewardDescText="Rewards slaves for serving their master well. When slaves become free, they are awarded with weapons and health depending on how much favor they earned."
@@ -975,8 +975,8 @@ defaultproperties
      FavorTarget=100
      FavorPropText="Favor Needed"
      FavorDescText="Defines the amount of favor a slave needs to gain in order to be freed."
-     ScreenShotName="OLSlave.slaveshots"
-     PlayerControllerClassName="OLSlave.OLSlavePlayerController"
+     ScreenShotName="OLGhostMaster.slaveshots"
+     PlayerControllerClassName="OLGhostMaster.OLSlavePlayerController"
      SLVHints(0)="Picking up valuable items such as the Super Shield Pack or Double Damage is worth a lot of favor. Go for the good items!"
      SLVHints(1)="As a slave, you can earn extra favor by tagging other slavemasters so your master can see where they are."
      SLVHints(2)="The more slaves a slavemaster controls, the more points they are worth when killed."

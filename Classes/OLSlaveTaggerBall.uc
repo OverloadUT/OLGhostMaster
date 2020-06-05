@@ -128,9 +128,9 @@ defaultproperties
      CollisionHeight=10.000000
      bUseCollisionStaticMesh=True
      DrawType=DT_Sprite
-     Texture=Texture'OLSlave.effects.tagger_core_low'
+     Texture=Texture'OLGhostMasterTex.effects.tagger_core_low'
      DrawScale=0.500000
-     Skins(0)=Texture'OLSlave.effects.tagger_core_low'
+     Skins(0)=Texture'OLGhostMasterTex.effects.tagger_core_low'
      Style=STY_Translucent
      bAlwaysFaceCamera=True
 }

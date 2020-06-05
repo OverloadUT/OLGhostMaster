@@ -126,7 +126,7 @@ function MakeSlave()
     while(Inventory != none)
         Inventory.Destroy();
 
-    CreateInventory("OLSlave.OLSlaveTagger");
+    CreateInventory("OLGhostMaster.OLSlaveTagger");
     Controller.ClientSetWeapon(class'OLSlaveTagger');
 
 
@@ -462,7 +462,7 @@ state Dying
 defaultproperties
 {
      InvisMaterial=FinalBlend'MutantSkins.Shaders.MutantGlowFinal'
-     SlaveFXClass=OLSlave.OLSlaveGlow
+     SlaveFXClass=OLGhostMaster.OLSlaveGlow
      SlaveDeResLiftVel=(Points=(,(InVal=2.500000,OutVal=32.000000),(InVal=100.000000,OutVal=32.000000)))
      SlaveDeResLiftSoftness=(Points=((OutVal=0.300000),(InVal=2.500000,OutVal=0.050000),(InVal=100.000000,OutVal=0.050000)))
      SlaveDeResLateralFriction=0.300000
