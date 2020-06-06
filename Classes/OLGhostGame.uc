@@ -15,21 +15,6 @@ class OLGhostGame extends xDeathMatch;
 #exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLGhostMaster
 #exec OBJ LOAD File="Texture\OLGhostMasterTex.utx" Package=OLGhostMaster
 
-//#exec AUDIO IMPORT FILE="Sounds\tut_01.wav" Name="tut_01"
-//#exec AUDIO IMPORT FILE="Sounds\tut_02.wav" Name="tut_02"
-//#exec AUDIO IMPORT FILE="Sounds\tut_03.wav" Name="tut_03"
-//#exec AUDIO IMPORT FILE="Sounds\tut_04.wav" Name="tut_04"
-//#exec AUDIO IMPORT FILE="Sounds\tut_05.wav" Name="tut_05"
-//#exec AUDIO IMPORT FILE="Sounds\tut_06.wav" Name="tut_06"
-//#exec AUDIO IMPORT FILE="Sounds\tut_07.wav" Name="tut_07"
-//#exec AUDIO IMPORT FILE="Sounds\tut_08.wav" Name="tut_08"
-//#exec AUDIO IMPORT FILE="Sounds\tut_09.wav" Name="tut_09"
-//#exec AUDIO IMPORT FILE="Sounds\tut_10.wav" Name="tut_10"
-//#exec AUDIO IMPORT FILE="Sounds\tut_11.wav" Name="tut_11"
-//#exec AUDIO IMPORT FILE="Sounds\tut_12.wav" Name="tut_12"
-//#exec AUDIO IMPORT FILE="Sounds\tut_13.wav" Name="tut_13"
-//#exec AUDIO IMPORT FILE="Sounds\tut_14.wav" Name="tut_14"
-
 var() config int FavorTarget;
 var() config bool bRewardSystem;
 var() config bool bGhostsEthereal;
