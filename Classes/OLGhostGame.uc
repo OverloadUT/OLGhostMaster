@@ -893,7 +893,7 @@ defaultproperties
      FavorTarget=100
      FavorPropText="Favor Needed"
      FavorDescText="Defines the amount of favor ghosts need to earn their mortal bodies."
-     ScreenShotName="OLGhostMasterTex.slaveshots"
+     ScreenShotName="OLGhostMaster.ghostshots"
      PlayerControllerClassName="OLGhostMaster.OLGhostPlayerController"
      GHMHints(0)="Picking up valuable items such as the Super Shield Pack or Double Damage is worth a lot of favor. Go for the good items!"
      GHMHints(1)="As a ghost, you can earn extra favor by tagging other ghostmasters so your master can see where they are."
