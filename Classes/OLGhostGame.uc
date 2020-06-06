@@ -8,13 +8,12 @@
 
 class OLGhostGame extends xDeathMatch;
 
-//#exec AUDIO IMPORT FILE="Sounds\Liberated.wav" NAME="liberated" Package=OLGhostAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\Insurrection.wav" NAME="insurrection" Package=OLGhostAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\Ghosted.wav" NAME="ghosted" Package=OLGhostAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLGhostAnnouncer
-//#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLGhostAnnouncer
-// #exec OBJ LOAD File="..\Textures\OLGhostMasterTex.utx" Package=OLGhostMaster
-#exec OBJ LOAD File="..\Sounds\OLGhostAnnouncer.uax"
+#exec AUDIO IMPORT FILE="Sounds\Liberated.wav" NAME="liberated" Package=OLGhostMaster
+#exec AUDIO IMPORT FILE="Sounds\Insurrection.wav" NAME="insurrection" Package=OLGhostMaster
+// #exec AUDIO IMPORT FILE="Sounds\Ghosted.wav" NAME="ghosted" Package=OLGhostMaster
+#exec AUDIO IMPORT FILE="Sounds\EarnedFreedom.wav" NAME="earnedfreedom" Package=OLGhostMaster
+#exec AUDIO IMPORT FILE="Sounds\OverloadJoinedMatch.wav" NAME="overloadjoined" Package=OLGhostMaster
+#exec OBJ LOAD File="Texture\OLGhostMasterTex.utx" Package=OLGhostMaster
 
 //#exec AUDIO IMPORT FILE="Sounds\tut_01.wav" Name="tut_01"
 //#exec AUDIO IMPORT FILE="Sounds\tut_02.wav" Name="tut_02"
@@ -49,11 +48,11 @@ static function PrecacheGameAnnouncements(AnnouncerVoice V, bool bRewardSounds)
     Super.PrecacheGameAnnouncements(V,bRewardSounds);
     if ( !bRewardSounds )
     {
-        // V.PrecacheFallbackPackage("OLGhostAnnouncer",'ghosted'); (doesn't exist)
-        V.PrecacheFallbackPackage("OLGhostAnnouncer",'liberated');
-        V.PrecacheFallbackPackage("OLGhostAnnouncer",'earnedfreedom');
-        // V.PrecacheFallbackPackage("OLGhostAnnouncer",'Ghosted'); (doesn't exist)
-        V.PrecacheFallbackPackage("OLGhostAnnouncer",'overloadjoined');
+        // V.PrecacheFallbackPackage("OLGhostMaster",'ghosted'); (doesn't exist)
+        V.PrecacheFallbackPackage("OLGhostMaster",'liberated');
+        V.PrecacheFallbackPackage("OLGhostMaster",'earnedfreedom');
+        V.PrecacheFallbackPackage("OLGhostMaster",'insurrection');
+        V.PrecacheFallbackPackage("OLGhostMaster",'overloadjoined');
     }
 }
 
