@@ -53,6 +53,9 @@ ChangeLog:
 Unzip the contents of GhostMaster30.zip into your UT2004 directory. It
 will place the files in the proper locations.
 
+Note: For Steam installs, your UT2004 directory will be located in
+{Steam Library Location}\steamapps\common\Unreal Tournament 2004
+
 To play Ghost Master, fire up UT2004, go to instant action or host game,
 then choose Ghost Master from the list of gametypes.
 
